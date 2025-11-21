@@ -1,79 +1,157 @@
 <script lang="ts">
-	import '../app.css';
-	import { page } from '$app/stores';
+  import '../app.css';
+  import { page } from '$app/stores';
+  import { onMount } from 'svelte';
+  import { theme } from '$lib/stores/theme';
+  import ThemeToggle from '$lib/components/marketing/ThemeToggle.svelte';
+
+  // Initialize theme on mount
+  onMount(() => {
+    theme.initialize();
+  });
 </script>
 
 <div class="app">
-	<nav>
-		<div class="nav-content">
-			<h1 class="logo">Foldline</h1>
-			<div class="nav-links">
-				<a href="/" class:active={$page.url.pathname === '/'}>Setup</a>
-				<a href="/dashboard" class:active={$page.url.pathname === '/dashboard'}>Dashboard</a>
-				<a href="/heatmaps" class:active={$page.url.pathname === '/heatmaps'}>Heatmaps</a>
-				<a href="/trends" class:active={$page.url.pathname === '/trends'}>Trends</a>
-				<a href="/correlation" class:active={$page.url.pathname === '/correlation'}>Correlation</a>
-				<a href="/settings" class:active={$page.url.pathname === '/settings'}>Settings</a>
-				<a href="/about" class:active={$page.url.pathname === '/about'}>About</a>
-			</div>
-		</div>
-	</nav>
+  <nav class="nav">
+    <div class="nav-content">
+      <!-- Logo -->
+      <a href="/" class="logo-link">
+        <img
+          src={$theme === 'dark' ? '/brand/logo-dark.svg' : '/brand/logo-light.svg'}
+          alt="Foldline"
+          class="logo-img"
+          width="30"
+          height="90"
+        />
+      </a>
 
-	<main>
-		<slot />
-	</main>
+      <!-- Navigation Links -->
+      <div class="nav-links">
+        <a href="/marketing" class="nav-link" class:active={$page.url.pathname === '/marketing'}>Marketing</a>
+        <a href="/" class="nav-link" class:active={$page.url.pathname === '/'}>Setup</a>
+        <a href="/dashboard" class="nav-link" class:active={$page.url.pathname === '/dashboard'}>Dashboard</a>
+        <a href="/heatmaps" class="nav-link" class:active={$page.url.pathname === '/heatmaps'}>Heatmaps</a>
+        <a href="/trends" class="nav-link" class:active={$page.url.pathname === '/trends'}>Trends</a>
+        <a href="/correlation" class="nav-link" class:active={$page.url.pathname === '/correlation'}>Correlation</a>
+        <a href="/settings" class="nav-link" class:active={$page.url.pathname === '/settings'}>Settings</a>
+        <a href="/about" class="nav-link" class:active={$page.url.pathname === '/about'}>About</a>
+      </div>
+
+      <!-- Theme Toggle -->
+      <ThemeToggle />
+    </div>
+  </nav>
+
+  <main>
+    <slot />
+  </main>
 </div>
 
 <style>
-	.app {
-		display: flex;
-		flex-direction: column;
-		min-height: 100vh;
-	}
+  .app {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
 
-	nav {
-		background-color: var(--color-bg-secondary);
-		border-bottom: 1px solid var(--color-border);
-		padding: 0 var(--spacing);
-	}
+  .nav {
+    background-color: transparent;
+    border-bottom: var(--stroke-weight) solid var(--line-color);
+    padding: 0 var(--space-xl);
+    position: sticky;
+    top: 0;
+    z-index: var(--z-nav);
+    backdrop-filter: blur(8px);
+    background-color: rgba(var(--color-bg), 0.8);
+  }
 
-	.nav-content {
-		max-width: 1200px;
-		margin: 0 auto;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		height: 60px;
-	}
+  .nav-content {
+    max-width: var(--container-max-width);
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--nav-height);
+    gap: var(--space-l);
+  }
 
-	.logo {
-		font-size: 1.5rem;
-		font-weight: 700;
-		margin: 0;
-		color: var(--color-primary);
-	}
+  .logo-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
 
-	.nav-links {
-		display: flex;
-		gap: calc(var(--spacing) * 1.5);
-	}
+  .logo-img {
+    display: block;
+    width: 30px;
+    height: 90px;
+  }
 
-	.nav-links a {
-		color: var(--color-text-secondary);
-		text-decoration: none;
-		font-weight: 500;
-		transition: color 0.2s;
-	}
+  .nav-links {
+    display: flex;
+    gap: var(--space-l);
+    flex: 1;
+    justify-content: center;
+  }
 
-	.nav-links a:hover {
-		color: var(--color-text);
-	}
+  .nav-link {
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    font-size: var(--type-body-small);
+    font-weight: var(--font-weight-regular);
+    transition: color var(--transition-duration) var(--transition-easing);
+    position: relative;
+    padding: 4px 0;
+  }
 
-	.nav-links a.active {
-		color: var(--color-primary);
-	}
+  .nav-link:hover {
+    color: var(--color-text);
+  }
 
-	main {
-		flex: 1;
-	}
+  .nav-link.active {
+    color: var(--color-accent);
+  }
+
+  /* Minimal underline for active link */
+  .nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--stroke-weight);
+    background-color: var(--color-accent);
+  }
+
+  main {
+    flex: 1;
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .nav {
+      padding: 0 var(--space-m);
+    }
+
+    .nav-links {
+      gap: var(--space-m);
+      font-size: var(--type-micro);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .nav-content {
+      height: 56px;
+    }
+
+    .logo-img {
+      width: 25px;
+      height: 75px;
+    }
+
+    .nav-links {
+      display: none; /* Hide nav links on mobile - could be replaced with hamburger menu */
+    }
+  }
 </style>
