@@ -26,7 +26,7 @@
             src={$theme === 'dark' ? '/brand/logo-dark.svg' : '/brand/logo-light.svg'}
             alt="Foldline logo"
             width="40"
-            height="120"
+            height="100"
           />
         </div>
         <p class="footer-tagline">Your physiological map, unfolded.</p>
@@ -98,7 +98,7 @@
 
   .footer-logo img {
     width: 30px;
-    height: 90px;
+    height: 75px;
   }
 
   .footer-tagline {
@@ -174,7 +174,7 @@
 
     .footer-logo img {
       width: 25px;
-      height: 75px;
+      height: 63px;
     }
   }
 </style>

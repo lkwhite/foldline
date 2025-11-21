@@ -21,7 +21,7 @@
           alt="Foldline"
           class="logo-img"
           width="30"
-          height="90"
+          height="75"
         />
       </a>
 
@@ -85,7 +85,7 @@
   .logo-img {
     display: block;
     width: 30px;
-    height: 90px;
+    height: 75px;
   }
 
   .nav-links {
@@ -147,7 +147,7 @@
 
     .logo-img {
       width: 25px;
-      height: 75px;
+      height: 63px;
     }
 
     .nav-links {

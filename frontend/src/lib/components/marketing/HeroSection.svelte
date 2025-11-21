@@ -20,7 +20,7 @@
             src={$theme === 'dark' ? '/brand/logo-dark.svg' : '/brand/logo-light.svg'}
             alt="Foldline logo"
             width="40"
-            height="120"
+            height="100"
           />
         </div>
 
@@ -145,7 +145,7 @@
 
     .hero-logo img {
       width: 30px;
-      height: 90px;
+      height: 75px;
     }
   }
 </style>
