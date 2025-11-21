@@ -27,7 +27,6 @@
 
       <!-- Navigation Links -->
       <div class="nav-links">
-        <a href="/marketing" class="nav-link" class:active={$page.url.pathname === '/marketing'}>Marketing</a>
         <a href="/" class="nav-link" class:active={$page.url.pathname === '/'}>Setup</a>
         <a href="/dashboard" class="nav-link" class:active={$page.url.pathname === '/dashboard'}>Dashboard</a>
         <a href="/heatmaps" class="nav-link" class:active={$page.url.pathname === '/heatmaps'}>Heatmaps</a>

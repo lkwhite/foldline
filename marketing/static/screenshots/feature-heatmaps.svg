@@ -1,0 +1,24 @@
+<svg width="1200" height="700" viewBox="0 0 1200 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1200" height="700" fill="#F7F5EF"/>
+
+  <!-- Border -->
+  <rect x="1" y="1" width="1198" height="698" stroke="#DCD8CA" stroke-width="2" fill="none"/>
+
+  <!-- Placeholder text -->
+  <text x="600" y="330" font-family="Inter, sans-serif" font-size="32" fill="#666666" text-anchor="middle">
+    Heatmap Feature Screenshot
+  </text>
+  <text x="600" y="380" font-family="Inter, sans-serif" font-size="18" fill="#999999" text-anchor="middle">
+    1200 × 700 px
+  </text>
+
+  <!-- Simple heatmap grid mockup -->
+  <g opacity="0.3">
+    {#each Array(10) as _, i}
+      {#each Array(15) as _, j}
+        <rect x={100 + j * 70} y={150 + i * 40} width="65" height="35" fill="#DCD8CA" stroke="#F7F5EF" stroke-width="2"/>
+      {/each}
+    {/each}
+  </g>
+</svg>
