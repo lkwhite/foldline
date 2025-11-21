@@ -1,0 +1,69 @@
+{
+  "sleep_records": [
+    {
+      "date": "2024-01-15",
+      "duration_minutes": 480,
+      "deep_minutes": 120,
+      "light_minutes": 240,
+      "rem_minutes": 90,
+      "awake_minutes": 30,
+      "sleep_score": 85,
+      "bedtime": "2024-01-14T23:00:00",
+      "wake_time": "2024-01-15T07:00:00"
+    },
+    {
+      "date": "2024-01-16",
+      "duration_minutes": 420,
+      "deep_minutes": 90,
+      "light_minutes": 210,
+      "rem_minutes": 80,
+      "awake_minutes": 40,
+      "sleep_score": 72,
+      "bedtime": "2024-01-15T23:30:00",
+      "wake_time": "2024-01-16T06:30:00"
+    }
+  ],
+  "hrv_records": [
+    {
+      "date": "2024-01-15",
+      "hrv_value": 55,
+      "measurement_type": "morning"
+    },
+    {
+      "date": "2024-01-16",
+      "hrv_value": 58,
+      "measurement_type": "morning"
+    },
+    {
+      "date": "2024-01-17",
+      "hrv_value": 52,
+      "measurement_type": "morning"
+    }
+  ],
+  "stress_records": [
+    {
+      "timestamp": "2024-01-15T08:00:00",
+      "stress_level": 25
+    },
+    {
+      "timestamp": "2024-01-15T12:00:00",
+      "stress_level": 65
+    },
+    {
+      "timestamp": "2024-01-15T18:00:00",
+      "stress_level": 45
+    }
+  ],
+  "activities": [
+    {
+      "activity_id": "test-activity-001",
+      "start_time": "2024-01-15T06:00:00",
+      "activity_type": "running",
+      "duration_seconds": 1800,
+      "distance_meters": 5000,
+      "avg_heart_rate": 150,
+      "max_heart_rate": 172,
+      "training_load": 45
+    }
+  ]
+}

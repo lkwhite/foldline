@@ -237,6 +237,89 @@ The Rust shell in `src-tauri/src/main.rs` handles:
 - `get_backend_port()` - Get backend URL
 - `check_backend_health()` - Ping backend
 
+## Testing
+
+Foldline has a comprehensive test suite covering the backend, frontend, and Tauri shell.
+
+### Running Tests
+
+**Python Backend Tests:**
+```bash
+cd backend
+pytest tests/ -v
+```
+
+Run with coverage:
+```bash
+cd backend
+pytest tests/ -v --cov=. --cov-report=html --cov-report=term-missing
+```
+
+**Rust/Tauri Tests:**
+```bash
+cd src-tauri
+cargo test --verbose
+```
+
+**Frontend Tests:**
+```bash
+cd frontend
+npm run test
+```
+
+Run in watch mode:
+```bash
+cd frontend
+npm run test:watch
+```
+
+Run with UI:
+```bash
+cd frontend
+npm run test:ui
+```
+
+### Test Structure
+
+**Backend Tests** (`backend/tests/`):
+- `test_fit_folder.py` - FIT file scanning and deduplication
+- `test_garmin_gdpr.py` - GDPR export parsing
+- `test_database.py` - Database operations and schema
+- `test_sleep.py` - Sleep metrics calculations
+- `test_hrv.py` - HRV analysis
+- `test_stress.py` - Stress aggregation
+- `test_api.py` - FastAPI endpoint validation
+
+**Tauri Tests** (`src-tauri/tests/`):
+- `integration_test.rs` - Process management and health checks
+
+**Frontend Tests** (`frontend/src/lib/`):
+- `api.test.ts` - API client and error handling
+
+### CI/CD
+
+Tests run automatically on every push and pull request via GitHub Actions.
+
+**Workflow:** `.github/workflows/test.yml`
+
+The CI pipeline runs:
+1. Python backend tests (pytest)
+2. Rust/Tauri tests (cargo test)
+3. Frontend tests (vitest)
+
+All tests must pass before merging.
+
+### Test Coverage
+
+Current focus areas:
+- ✅ Data integrity (FIT parsing, deduplication)
+- ✅ Database operations (CRUD, schema validation)
+- ✅ Metrics calculations (sleep, HRV, stress)
+- ✅ API validation (request/response contracts)
+- ✅ Process management (backend spawning, cleanup)
+
+See `TESTING_PLAN.md` for detailed testing strategy.
+
 ## Packaging Python Backend
 
 For production builds, the Python backend is compiled into a standalone binary using PyInstaller:
