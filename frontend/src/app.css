@@ -7,8 +7,8 @@
    IMPORT DESIGN TOKENS
    ============================================ */
 
-@import '/design/BRAND_TOKENS.css';
-@import '/design/TYPOGRAPHY.css';
+@import '../../design/BRAND_TOKENS.css';
+@import '../../design/TYPOGRAPHY.css';
 @import './lib/styles/linework.css';
 
 /* ============================================
