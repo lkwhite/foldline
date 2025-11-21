@@ -1,0 +1,41 @@
+<svg width="60" height="180" viewBox="0 0 60 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer map outline -->
+  <rect
+    x="0.75"
+    y="0.75"
+    width="58.5"
+    height="178.5"
+    rx="2"
+    stroke="#E5E5E5"
+    stroke-width="1.5"
+    fill="none"
+  />
+
+  <!-- Vertical fold lines (3 folds) -->
+  <line
+    x1="15"
+    y1="0"
+    x2="15"
+    y2="180"
+    stroke="#E5E5E5"
+    stroke-width="1.5"
+  />
+
+  <line
+    x1="30"
+    y1="0"
+    x2="30"
+    y2="180"
+    stroke="#E5E5E5"
+    stroke-width="1.5"
+  />
+
+  <line
+    x1="45"
+    y1="0"
+    x2="45"
+    y2="180"
+    stroke="#E5E5E5"
+    stroke-width="1.5"
+  />
+</svg>
