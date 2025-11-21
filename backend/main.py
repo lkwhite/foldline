@@ -1,0 +1,350 @@
+"""
+Foldline Backend - Local-only FastAPI server for wearable data analysis
+
+This backend runs entirely on localhost and never makes external API calls.
+It processes:
+  - Garmin GDPR export zips
+  - Local FIT file directories
+
+All data stays on the user's machine.
+"""
+
+import argparse
+import uvicorn
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from typing import Optional, List, Dict, Any
+from datetime import date, datetime
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Initialize FastAPI app
+app = FastAPI(
+    title="Foldline Backend",
+    description="Local-only wearable data analyzer",
+    version="0.1.0"
+)
+
+# CORS middleware - only allow localhost origins
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",  # Vite dev server
+        "http://localhost:1420",  # Tauri dev
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:1420",
+        "tauri://localhost",  # Tauri production
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ============================================================================
+# Request/Response Models
+# ============================================================================
+
+class GarminExportRequest(BaseModel):
+    """Request to import a Garmin GDPR export zip"""
+    zip_path: str
+
+
+class FitFolderRequest(BaseModel):
+    """Request to import a FIT file folder"""
+    folder_path: str
+
+
+class DataRootRequest(BaseModel):
+    """Request to set the data root directory"""
+    data_root: str
+
+
+class StatusResponse(BaseModel):
+    """System status response"""
+    db_initialized: bool
+    available_metrics: List[str]
+    min_date: Optional[str]
+    max_date: Optional[str]
+    counts: Dict[str, int]
+
+
+class ImportResponse(BaseModel):
+    """Response from import operations"""
+    success: bool
+    message: str
+    summary: Dict[str, Any]
+
+
+class HeatmapDataPoint(BaseModel):
+    """Single data point for heatmap"""
+    date: str
+    value: Optional[float]
+
+
+class TimeSeriesDataPoint(BaseModel):
+    """Single data point for time series"""
+    date: str
+    value: Optional[float]
+
+
+class CorrelationResponse(BaseModel):
+    """Correlation analysis response"""
+    x_values: List[float]
+    y_values: List[float]
+    dates: List[str]
+    stats: Dict[str, Any]
+
+
+# ============================================================================
+# Status Endpoints
+# ============================================================================
+
+@app.get("/")
+async def root():
+    """Health check endpoint"""
+    return {"status": "ok", "message": "Foldline backend is running"}
+
+
+@app.get("/status", response_model=StatusResponse)
+async def get_status():
+    """
+    Get the current status of the backend and database
+
+    TODO: Replace with actual DB queries
+    """
+    # Stub response - replace with actual DB checks
+    return StatusResponse(
+        db_initialized=True,  # TODO: Check if DB exists and has schema
+        available_metrics=[
+            "sleep_duration",
+            "resting_hr",
+            "hrv",
+            "stress",
+            "steps",
+            "training_load"
+        ],
+        min_date="2020-01-01",  # TODO: Query actual min date from DB
+        max_date="2025-01-01",  # TODO: Query actual max date from DB
+        counts={
+            "nights": 1825,  # TODO: Count sleep records
+            "activities": 542,  # TODO: Count activity records
+            "days_with_data": 1800,  # TODO: Count distinct dates with any data
+        }
+    )
+
+
+# ============================================================================
+# Import Endpoints
+# ============================================================================
+
+@app.post("/import/garmin-export", response_model=ImportResponse)
+async def import_garmin_export(request: GarminExportRequest):
+    """
+    Import a Garmin GDPR export zip file
+
+    Steps:
+    1. Validate zip file exists
+    2. Extract to internal data directory
+    3. Locate FIT/TCX/JSON files
+    4. Parse relevant metrics (sleep, HR, HRV, stress, steps, training load)
+    5. Store in DB with deduplication
+    6. Return summary
+
+    TODO: Implement actual zip extraction and parsing logic
+    """
+    logger.info(f"Importing Garmin export from: {request.zip_path}")
+
+    # TODO: Validate file exists
+    # TODO: Extract zip to data directory
+    # TODO: Parse FIT/TCX/JSON files using ingestion/garmin_gdpr.py
+    # TODO: Store in DB
+
+    # Stub response
+    return ImportResponse(
+        success=True,
+        message="GDPR export imported successfully (stub)",
+        summary={
+            "activities_found": 120,
+            "sleep_records": 365,
+            "date_range": "2023-01-01 to 2024-01-01",
+            "metrics_available": ["sleep", "resting_hr", "hrv", "stress", "steps"]
+        }
+    )
+
+
+@app.post("/import/fit-folder", response_model=ImportResponse)
+async def import_fit_folder(request: FitFolderRequest):
+    """
+    Import FIT files from a local directory (e.g., Garmin Express folder)
+
+    Steps:
+    1. Validate folder exists
+    2. Recursively walk directory tree
+    3. Parse all .fit files
+    4. Deduplicate based on file hash or activity ID
+    5. Insert new records into DB
+    6. Return summary
+
+    TODO: Implement actual directory walking and FIT parsing
+    """
+    logger.info(f"Importing FIT folder from: {request.folder_path}")
+
+    # TODO: Validate directory exists
+    # TODO: Walk directory tree using ingestion/fit_folder.py
+    # TODO: Parse FIT files
+    # TODO: Deduplicate and insert into DB
+
+    # Stub response
+    return ImportResponse(
+        success=True,
+        message="FIT folder imported successfully (stub)",
+        summary={
+            "files_found": 45,
+            "new_records": 32,
+            "duplicates_skipped": 13,
+            "date_range": "2024-01-01 to 2025-01-21"
+        }
+    )
+
+
+# ============================================================================
+# Metrics Endpoints
+# ============================================================================
+
+@app.get("/metrics/heatmap")
+async def get_heatmap_data(
+    metric: str,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None
+) -> List[HeatmapDataPoint]:
+    """
+    Get heatmap data for a specific metric
+
+    Returns a list of {date, value} that can be binned into a year × day heatmap
+
+    TODO: Implement actual DB queries for each metric type
+    """
+    logger.info(f"Fetching heatmap data for metric: {metric}")
+
+    # TODO: Validate metric is supported
+    # TODO: Query DB for metric between start_date and end_date
+    # TODO: Return array of {date, value}
+
+    # Stub response - generate some fake data
+    stub_data = []
+    for i in range(100):
+        stub_data.append(HeatmapDataPoint(
+            date=f"2024-{(i % 12) + 1:02d}-{(i % 28) + 1:02d}",
+            value=float(i % 10)
+        ))
+
+    return stub_data
+
+
+@app.get("/metrics/timeseries")
+async def get_timeseries_data(
+    metric: str,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None
+) -> List[TimeSeriesDataPoint]:
+    """
+    Get time series data for plotting
+
+    Returns a simple array of {date, value} for line charts
+
+    TODO: Implement actual DB queries and optional smoothing
+    """
+    logger.info(f"Fetching timeseries data for metric: {metric}")
+
+    # TODO: Query DB for metric
+    # TODO: Optional: apply smoothing (rolling mean)
+
+    # Stub response
+    stub_data = []
+    for i in range(50):
+        stub_data.append(TimeSeriesDataPoint(
+            date=f"2024-{(i % 12) + 1:02d}-{(i % 28) + 1:02d}",
+            value=float(50 + (i % 20))
+        ))
+
+    return stub_data
+
+
+@app.get("/metrics/correlation", response_model=CorrelationResponse)
+async def get_correlation_data(
+    x_metric: str,
+    y_metric: str,
+    lag_days: Optional[int] = 0
+):
+    """
+    Get correlation data between two metrics
+
+    Returns aligned values for scatter plots and correlation stats
+
+    TODO: Implement actual correlation analysis
+    """
+    logger.info(f"Calculating correlation: {x_metric} vs {y_metric} (lag={lag_days})")
+
+    # TODO: Query both metrics from DB
+    # TODO: Align by date with optional lag
+    # TODO: Calculate Pearson/Spearman correlation
+    # TODO: Return scatter data and stats
+
+    # Stub response
+    return CorrelationResponse(
+        x_values=[1.0, 2.0, 3.0, 4.0, 5.0],
+        y_values=[2.0, 4.0, 6.0, 8.0, 10.0],
+        dates=["2024-01-01", "2024-01-02", "2024-01-03", "2024-01-04", "2024-01-05"],
+        stats={
+            "pearson_r": 0.95,
+            "pearson_p": 0.001,
+            "spearman_r": 0.93,
+            "spearman_p": 0.002,
+            "n": 5
+        }
+    )
+
+
+# ============================================================================
+# Settings Endpoints
+# ============================================================================
+
+@app.post("/settings/data-root")
+async def set_data_root(request: DataRootRequest):
+    """
+    Set or update the root directory for data storage
+
+    TODO: Implement persistent settings storage
+    """
+    logger.info(f"Setting data root to: {request.data_root}")
+
+    # TODO: Validate directory exists or create it
+    # TODO: Store setting in config file or DB
+    # TODO: Migrate existing data if needed
+
+    return {"success": True, "message": "Data root updated"}
+
+
+# ============================================================================
+# Main
+# ============================================================================
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Foldline Backend Server")
+    parser.add_argument("--port", type=int, default=8000, help="Port to run on")
+    parser.add_argument("--host", type=str, default="127.0.0.1", help="Host to bind to")
+    args = parser.parse_args()
+
+    logger.info(f"Starting Foldline backend on {args.host}:{args.port}")
+    logger.info("This is a LOCAL-ONLY server. No external API calls are made.")
+
+    uvicorn.run(
+        app,
+        host=args.host,  # MUST be 127.0.0.1 for security
+        port=args.port,
+        log_level="info"
+    )
