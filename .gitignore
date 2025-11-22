@@ -21,9 +21,9 @@ frontend/.svelte-kit/
 frontend/build/
 frontend/.env
 frontend/.env.local
-frontend/package-lock.json
+# frontend/package-lock.json  # Temporarily removed - needed for CI cache
 node_modules/
-package-lock.json
+/package-lock.json
 
 # IDE
 .vscode/
@@ -38,6 +38,7 @@ src-tauri/bin/
 
 # Local data
 .foldline/
+userdata/
 *.db
 *.duckdb
 

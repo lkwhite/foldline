@@ -35,6 +35,10 @@ class Database:
             data_dir = Path.home() / ".foldline" / "data"
             data_dir.mkdir(parents=True, exist_ok=True)
             db_path = str(data_dir / "foldline.db")
+        else:
+            # Ensure parent directories exist for custom paths
+            db_file_path = Path(db_path)
+            db_file_path.parent.mkdir(parents=True, exist_ok=True)
 
         self.db_path = db_path
         self.connection = None
