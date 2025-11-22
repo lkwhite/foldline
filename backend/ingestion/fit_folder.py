@@ -12,13 +12,13 @@ import hashlib
 import logging
 from datetime import datetime
 
+logger = logging.getLogger(__name__)
+
 try:
     from fitparse import FitFile
 except ImportError:
     FitFile = None
     logger.warning("fitparse not available - FIT file parsing will not work")
-
-logger = logging.getLogger(__name__)
 
 
 def scan_fit_directory(folder_path: str) -> List[str]:

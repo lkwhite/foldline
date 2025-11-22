@@ -312,7 +312,7 @@ def process_gdpr_export(
                         })
                         continue
 
-                    records_inserted = insert_sleep_data(parsed_data, db_connection)
+                    records_inserted = insert_sleep_data(parsed_data, db_connection, source="gdpr")
 
                     if records_inserted > 0:
                         summary["by_category"]["sleep_json"]["processed"] += 1
@@ -361,7 +361,7 @@ def process_gdpr_export(
                         })
                         continue
 
-                    records_inserted = insert_daily_summary_data(parsed_data, db_connection)
+                    records_inserted = insert_daily_summary_data(parsed_data, db_connection, source="gdpr")
 
                     if records_inserted > 0:
                         summary["by_category"]["daily_summaries"]["processed"] += 1

@@ -238,13 +238,14 @@ def parse_daily_summary_json(json_data: Dict[str, Any], file_path: str) -> Dict[
     return parsed_data
 
 
-def insert_sleep_data(parsed_data: Dict[str, Any], db_connection) -> int:
+def insert_sleep_data(parsed_data: Dict[str, Any], db_connection, source: str = "gdpr") -> int:
     """
     Insert parsed sleep data into sleep_detailed table
 
     Args:
         parsed_data: Data returned from parse_sleep_json()
         db_connection: Database connection
+        source: Source identifier ('gdpr', 'manual', etc.)
 
     Returns:
         Number of records inserted
@@ -268,9 +269,9 @@ def insert_sleep_data(parsed_data: Dict[str, Any], db_connection) -> int:
 
         # Insert file tracking record
         db_connection.execute(
-            """INSERT INTO imported_files (file_hash, file_path, file_type, record_count)
-               VALUES (?, ?, ?, ?)""",
-            (file_hash, file_path, 'json', 0)
+            """INSERT INTO imported_files (file_hash, file_path, file_type, source, record_count)
+               VALUES (?, ?, ?, ?, ?)""",
+            (file_hash, file_path, 'json', source, 0)
         )
 
         # Insert sleep records
@@ -288,20 +289,20 @@ def insert_sleep_data(parsed_data: Dict[str, Any], db_connection) -> int:
                         source_file_hash)
                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                     (sleep_id,
-                     sleep_record["date"],
-                     sleep_record["sleep_start_gmt"],
-                     sleep_record["sleep_end_gmt"],
-                     sleep_record["deep_sleep_seconds"],
-                     sleep_record["light_sleep_seconds"],
-                     sleep_record["rem_sleep_seconds"],
-                     sleep_record["awake_sleep_seconds"],
-                     sleep_record["sleep_window_confirmation_type"],
-                     sleep_record["average_respiration"],
-                     sleep_record["lowest_respiration"],
-                     sleep_record["highest_respiration"],
-                     sleep_record["average_spo2"],
-                     sleep_record["lowest_spo2"],
-                     sleep_record["average_sleep_hr"],
+                     sleep_record.get("date"),
+                     sleep_record.get("sleep_start_gmt"),
+                     sleep_record.get("sleep_end_gmt"),
+                     sleep_record.get("deep_sleep_seconds"),
+                     sleep_record.get("light_sleep_seconds"),
+                     sleep_record.get("rem_sleep_seconds"),
+                     sleep_record.get("awake_sleep_seconds"),
+                     sleep_record.get("sleep_window_confirmation_type"),
+                     sleep_record.get("average_respiration"),
+                     sleep_record.get("lowest_respiration"),
+                     sleep_record.get("highest_respiration"),
+                     sleep_record.get("average_spo2"),
+                     sleep_record.get("lowest_spo2"),
+                     sleep_record.get("average_sleep_hr"),
                      file_hash)
                 )
                 total_inserted += 1
@@ -317,21 +318,21 @@ def insert_sleep_data(parsed_data: Dict[str, Any], db_connection) -> int:
                            lowest_respiration = ?, highest_respiration = ?, average_spo2 = ?,
                            lowest_spo2 = ?, average_sleep_hr = ?, source_file_hash = ?
                            WHERE date = ?""",
-                        (sleep_record["sleep_start_gmt"],
-                         sleep_record["sleep_end_gmt"],
-                         sleep_record["deep_sleep_seconds"],
-                         sleep_record["light_sleep_seconds"],
-                         sleep_record["rem_sleep_seconds"],
-                         sleep_record["awake_sleep_seconds"],
-                         sleep_record["sleep_window_confirmation_type"],
-                         sleep_record["average_respiration"],
-                         sleep_record["lowest_respiration"],
-                         sleep_record["highest_respiration"],
-                         sleep_record["average_spo2"],
-                         sleep_record["lowest_spo2"],
-                         sleep_record["average_sleep_hr"],
+                        (sleep_record.get("sleep_start_gmt"),
+                         sleep_record.get("sleep_end_gmt"),
+                         sleep_record.get("deep_sleep_seconds"),
+                         sleep_record.get("light_sleep_seconds"),
+                         sleep_record.get("rem_sleep_seconds"),
+                         sleep_record.get("awake_sleep_seconds"),
+                         sleep_record.get("sleep_window_confirmation_type"),
+                         sleep_record.get("average_respiration"),
+                         sleep_record.get("lowest_respiration"),
+                         sleep_record.get("highest_respiration"),
+                         sleep_record.get("average_spo2"),
+                         sleep_record.get("lowest_spo2"),
+                         sleep_record.get("average_sleep_hr"),
                          file_hash,
-                         sleep_record["date"])
+                         sleep_record.get("date"))
                     )
                 else:
                     raise  # Re-raise if not a duplicate error
@@ -356,13 +357,14 @@ def insert_sleep_data(parsed_data: Dict[str, Any], db_connection) -> int:
     return total_inserted
 
 
-def insert_daily_summary_data(parsed_data: Dict[str, Any], db_connection) -> int:
+def insert_daily_summary_data(parsed_data: Dict[str, Any], db_connection, source: str = "gdpr") -> int:
     """
     Insert parsed daily summary data into daily_summaries table
 
     Args:
         parsed_data: Data returned from parse_daily_summary_json()
         db_connection: Database connection
+        source: Source identifier ('gdpr', 'manual', etc.)
 
     Returns:
         Number of records inserted
@@ -386,9 +388,9 @@ def insert_daily_summary_data(parsed_data: Dict[str, Any], db_connection) -> int
 
         # Insert file tracking record
         db_connection.execute(
-            """INSERT INTO imported_files (file_hash, file_path, file_type, record_count)
-               VALUES (?, ?, ?, ?)""",
-            (file_hash, file_path, 'json', 0)
+            """INSERT INTO imported_files (file_hash, file_path, file_type, source, record_count)
+               VALUES (?, ?, ?, ?, ?)""",
+            (file_hash, file_path, 'json', source, 0)
         )
 
         # Insert daily summary records
