@@ -237,6 +237,9 @@ async def import_fit_folder(request: FitFolderRequest):
             }
         )
 
+    except HTTPException:
+        # Re-raise HTTPExceptions (like 400 for invalid directories) as-is
+        raise
     except Exception as e:
         logger.error(f"Failed to import FIT folder {request.folder_path}: {e}")
         raise HTTPException(status_code=500, detail=f"Import failed: {str(e)}")

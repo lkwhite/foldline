@@ -147,11 +147,11 @@ class TestImportGarminExport:
 class TestImportFitFolder:
     """Tests for /import/fit-folder endpoint"""
 
-    def test_import_fit_folder_success(self, client):
+    def test_import_fit_folder_success(self, client, tmp_path):
         """Should accept valid folder path"""
         response = client.post(
             "/import/fit-folder",
-            json={"folder_path": "/path/to/fit/files"}
+            json={"folder_path": str(tmp_path)}
         )
 
         assert response.status_code == 200
@@ -170,19 +170,19 @@ class TestImportFitFolder:
 
         assert response.status_code == 422
 
-    def test_import_response_includes_summary(self, client):
+    def test_import_response_includes_summary(self, client, tmp_path):
         """Should include summary with file counts"""
         response = client.post(
             "/import/fit-folder",
-            json={"folder_path": "/test/folder"}
+            json={"folder_path": str(tmp_path)}
         )
 
+        assert response.status_code == 200
         data = response.json()
         assert isinstance(data["summary"], dict)
-        # Current stub includes:
-        # assert "files_found" in data["summary"]
-        # assert "new_records" in data["summary"]
-        # assert "duplicates_skipped" in data["summary"]
+        assert "files_found" in data["summary"]
+        assert "total_records" in data["summary"]
+        assert "duplicates_skipped" in data["summary"]
 
     def test_import_invalid_folder(self, client):
         """Should handle invalid/nonexistent folders"""
@@ -191,9 +191,10 @@ class TestImportFitFolder:
             json={"folder_path": "/nonexistent/folder"}
         )
 
-        # Current stub returns success
-        # When implemented, should validate:
-        # assert response.status_code == 400 or not data["success"]
+        # Should return 400 for invalid directory
+        assert response.status_code == 400
+        data = response.json()
+        assert "detail" in data
 
 
 class TestMetricsHeatmap:
@@ -471,13 +472,14 @@ class TestResponseSerialization:
         assert isinstance(data["available_metrics"], list)
         assert isinstance(data["counts"], dict)
 
-    def test_import_response_model(self, client):
+    def test_import_response_model(self, client, tmp_path):
         """ImportResponse should serialize correctly"""
         response = client.post(
             "/import/fit-folder",
-            json={"folder_path": "/test"}
+            json={"folder_path": str(tmp_path)}
         )
 
+        assert response.status_code == 200
         data = response.json()
 
         assert isinstance(data["success"], bool)
