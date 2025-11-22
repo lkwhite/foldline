@@ -126,27 +126,10 @@ def load_json_file(file_path: str) -> Optional[Dict[str, Any]]:
 
 def parse_sleep_json(json_data: Dict[str, Any], file_path: str) -> Dict[str, Any]:
     """
-    Parse sleep data from Garmin JSON files
+    Parse sleep data from Garmin JSON files using field mappings
 
-    Expected structure:
-    {
-        "sleepTimeSeconds": 28800,
-        "napTimeSeconds": 0,
-        "sleepStartTimestampGMT": "2024-01-15T02:00:00.0",
-        "sleepEndTimestampGMT": "2024-01-15T10:00:00.0",
-        "deepSleepSeconds": 7200,
-        "lightSleepSeconds": 18000,
-        "remSleepSeconds": 3600,
-        "awakeSleepSeconds": 600,
-        "sleepWindowConfirmationType": "ENHANCED_CONFIRMED_FINAL",
-        "averageRespiration": 14.5,
-        "lowestRespiration": 12.0,
-        "highestRespiration": 18.0,
-        "avgSleepStress": 8.5,
-        "averageSpO2Value": 96.5,
-        "lowestSpO2Value": 94.0,
-        "avgSleepHeartRate": 55
-    }
+    Uses field_mappings.py to handle field name variations across
+    different GDPR export versions
     """
     logger.info(f"Parsing sleep JSON: {file_path}")
 
@@ -158,18 +141,26 @@ def parse_sleep_json(json_data: Dict[str, Any], file_path: str) -> Dict[str, Any
     }
 
     try:
-        # Extract sleep date from filename or timestamps
+        from ingestion.field_mappings import map_sleep_record, parse_date, parse_timestamp
+
+        # Use field mappings to extract data
+        sleep_record = map_sleep_record(json_data)
+
+        # Extract sleep date
         sleep_date = None
 
+        # Try to get date from calendar_date field
+        if "calendar_date" in sleep_record:
+            sleep_date = parse_date(sleep_record["calendar_date"])
+
         # Try to get date from sleep start timestamp
-        if "sleepStartTimestampGMT" in json_data:
-            start_ts = parse_timestamp(json_data["sleepStartTimestampGMT"])
+        if not sleep_date and "sleep_start_gmt" in sleep_record:
+            start_ts = parse_timestamp(sleep_record["sleep_start_gmt"]) if isinstance(sleep_record["sleep_start_gmt"], str) else sleep_record["sleep_start_gmt"]
             if start_ts:
                 sleep_date = start_ts.date()
 
         # Fallback: extract date from filename
         if not sleep_date:
-            # Filename format: sleep_2024-01-15.json
             filename = os.path.basename(file_path)
             if "sleep_" in filename:
                 date_part = filename.replace("sleep_", "").replace(".json", "")
@@ -178,26 +169,16 @@ def parse_sleep_json(json_data: Dict[str, Any], file_path: str) -> Dict[str, Any
         if not sleep_date:
             raise ValueError("Could not determine sleep date from file")
 
-        # Build sleep record
-        sleep_record = {
-            "date": sleep_date,
-            "sleep_start_gmt": parse_timestamp(json_data.get("sleepStartTimestampGMT")),
-            "sleep_end_gmt": parse_timestamp(json_data.get("sleepEndTimestampGMT")),
-            "deep_sleep_seconds": json_data.get("deepSleepSeconds"),
-            "light_sleep_seconds": json_data.get("lightSleepSeconds"),
-            "rem_sleep_seconds": json_data.get("remSleepSeconds"),
-            "awake_sleep_seconds": json_data.get("awakeSleepSeconds"),
-            "sleep_window_confirmation_type": json_data.get("sleepWindowConfirmationType"),
-            "average_respiration": json_data.get("averageRespiration"),
-            "lowest_respiration": json_data.get("lowestRespiration"),
-            "highest_respiration": json_data.get("highestRespiration"),
-            "average_spo2": json_data.get("averageSpO2Value"),
-            "lowest_spo2": json_data.get("lowestSpO2Value"),
-            "average_sleep_hr": json_data.get("avgSleepHeartRate")
-        }
+        # Add date to record
+        sleep_record["date"] = sleep_date
+
+        # Convert string timestamps to datetime objects if needed
+        for ts_field in ["sleep_start_gmt", "sleep_end_gmt"]:
+            if ts_field in sleep_record and isinstance(sleep_record[ts_field], str):
+                sleep_record[ts_field] = parse_timestamp(sleep_record[ts_field])
 
         # Only add if we have meaningful data
-        if any(sleep_record[key] is not None for key in ["deep_sleep_seconds", "light_sleep_seconds", "rem_sleep_seconds"]):
+        if any(sleep_record.get(key) is not None for key in ["deep_sleep_seconds", "light_sleep_seconds", "rem_sleep_seconds"]):
             parsed_data["sleep_records"].append(sleep_record)
             logger.info(f"Parsed sleep record for {sleep_date}: {len(parsed_data['sleep_records'])} total")
         else:
@@ -212,9 +193,10 @@ def parse_sleep_json(json_data: Dict[str, Any], file_path: str) -> Dict[str, Any
 
 def parse_daily_summary_json(json_data: Dict[str, Any], file_path: str) -> Dict[str, Any]:
     """
-    Parse daily summary data from UDS JSON files
+    Parse daily summary data from UDS JSON files using field mappings
 
-    Expected structure includes steps, calories, heart rate, stress, body battery, etc.
+    Uses field_mappings.py to handle field name variations across
+    different GDPR export versions
     """
     logger.info(f"Parsing daily summary JSON: {file_path}")
 
@@ -226,40 +208,24 @@ def parse_daily_summary_json(json_data: Dict[str, Any], file_path: str) -> Dict[
     }
 
     try:
-        # Extract date from summary data
+        from ingestion.field_mappings import map_daily_summary_record, parse_date
+
+        # Use field mappings to extract data
+        summary_record = map_daily_summary_record(json_data)
+
+        # Extract date
         summary_date = None
-        if "calendarDate" in json_data:
-            summary_date = parse_date(json_data["calendarDate"])
+        if "calendar_date" in summary_record:
+            summary_date = parse_date(summary_record["calendar_date"]) if isinstance(summary_record["calendar_date"], str) else summary_record["calendar_date"]
 
         if not summary_date:
             raise ValueError("Could not determine summary date from file")
 
-        # Build daily summary record
-        summary_record = {
-            "date": summary_date,
-            "step_count": json_data.get("totalSteps"),
-            "calories_burned": json_data.get("totalKilocalories"),
-            "distance_meters": json_data.get("totalDistanceMeters"),
-            "floors_climbed": json_data.get("floorsAscended"),
-            "active_minutes": json_data.get("activeKilocalories"),
-            "sedentary_minutes": json_data.get("sedentaryKilocalories"),
-            "min_heart_rate": json_data.get("minHeartRate"),
-            "max_heart_rate": json_data.get("maxHeartRate"),
-            "resting_heart_rate": json_data.get("restingHeartRate"),
-            "avg_heart_rate": json_data.get("averageHeartRate"),
-            "stress_avg": json_data.get("averageStressLevel"),
-            "stress_max": json_data.get("maxStressLevel"),
-            "stress_min": json_data.get("restStressLevel"),
-            "body_battery_charged": json_data.get("bodyBatteryChargedValue"),
-            "body_battery_drained": json_data.get("bodyBatteryDrainedValue"),
-            "body_battery_start": json_data.get("bodyBatteryHighestValue"),
-            "body_battery_end": json_data.get("bodyBatteryLowestValue"),
-            "intensity_minutes_moderate": json_data.get("moderateIntensityMinutes"),
-            "intensity_minutes_vigorous": json_data.get("vigorousIntensityMinutes")
-        }
+        # Add date to record
+        summary_record["date"] = summary_date
 
         # Only add if we have meaningful data
-        if any(summary_record[key] is not None for key in ["step_count", "calories_burned", "resting_heart_rate"]):
+        if any(summary_record.get(key) is not None for key in ["step_count", "calories_burned", "resting_heart_rate"]):
             parsed_data["daily_summaries"].append(summary_record)
             logger.info(f"Parsed daily summary for {summary_date}")
         else:

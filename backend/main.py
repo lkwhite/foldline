@@ -160,26 +160,71 @@ async def import_garmin_export(request: GarminExportRequest):
     5. Store in DB with deduplication
     6. Return summary
 
-    TODO: Implement actual zip extraction and parsing logic
+    This implements the complete GDPR import pipeline per PRE_COMMERCIAL_MVP_PLAN.md Week 1
     """
     logger.info(f"Importing Garmin export from: {request.zip_path}")
 
-    # TODO: Validate file exists
-    # TODO: Extract zip to data directory
-    # TODO: Parse FIT/TCX/JSON files using ingestion/garmin_gdpr.py
-    # TODO: Store in DB
+    try:
+        import os
+        from db.connection import get_db
+        from ingestion.garmin_gdpr import process_gdpr_export
 
-    # Stub response
-    return ImportResponse(
-        success=True,
-        message="GDPR export imported successfully (stub)",
-        summary={
-            "activities_found": 120,
-            "sleep_records": 365,
-            "date_range": "2023-01-01 to 2024-01-01",
-            "metrics_available": ["sleep", "resting_hr", "hrv", "stress", "steps"]
-        }
-    )
+        # Validate file exists
+        if not os.path.exists(request.zip_path):
+            raise HTTPException(status_code=400, detail=f"ZIP file not found: {request.zip_path}")
+
+        if not request.zip_path.lower().endswith('.zip'):
+            raise HTTPException(status_code=400, detail=f"File must be a ZIP archive: {request.zip_path}")
+
+        # Get database connection
+        db = get_db()
+
+        # Process the GDPR export using the full pipeline
+        summary = process_gdpr_export(
+            zip_path=request.zip_path,
+            db_connection=db.connection,
+            progress_callback=None,  # TODO: Add WebSocket support for real-time progress
+            cleanup_temp=True
+        )
+
+        # Build success message
+        if summary["success"]:
+            message = f"GDPR export imported successfully! "
+            message += f"Processed {summary['total_files_processed']} files, "
+            message += f"inserted {summary['total_records_inserted']} records "
+            message += f"({summary['success_rate']}% success rate)"
+
+            if summary["duplicates_skipped"] > 0:
+                message += f", skipped {summary['duplicates_skipped']} duplicates"
+
+            if summary["errors"] > 0:
+                message += f". Warning: {summary['errors']} errors occurred"
+        else:
+            message = f"GDPR export import completed with errors. "
+            message += f"Processed {summary['total_files_processed']}/{summary['total_files_found']} files, "
+            message += f"inserted {summary['total_records_inserted']} records. "
+            message += f"{summary['errors']} errors occurred."
+
+        return ImportResponse(
+            success=summary["success"],
+            message=message,
+            summary={
+                "zip_path": summary["zip_path"],
+                "total_files_found": summary["total_files_found"],
+                "total_files_processed": summary["total_files_processed"],
+                "total_records_inserted": summary["total_records_inserted"],
+                "duplicates_skipped": summary["duplicates_skipped"],
+                "errors": summary["errors"],
+                "success_rate": summary["success_rate"],
+                "processing_time_seconds": summary["processing_time_seconds"],
+                "by_category": summary["by_category"],
+                "error_details": summary["error_details"][:10] if summary["error_details"] else []  # Limit to first 10 errors
+            }
+        )
+
+    except Exception as e:
+        logger.error(f"Failed to import GDPR export {request.zip_path}: {e}")
+        raise HTTPException(status_code=500, detail=f"Import failed: {str(e)}")
 
 
 @app.post("/import/fit-folder", response_model=ImportResponse)
