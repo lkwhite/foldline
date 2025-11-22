@@ -132,7 +132,8 @@ fn main() {
                 // Clean up backend process on window close
                 let app = window.app_handle();
                 let state = app.state::<BackendState>();
-                if let Some(mut child) = state.process.lock().unwrap().take() {
+                let child_option = state.process.lock().unwrap().take();
+                if let Some(mut child) = child_option {
                     let _ = child.kill();
                 }
             }
