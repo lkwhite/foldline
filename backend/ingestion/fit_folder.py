@@ -73,6 +73,23 @@ def compute_file_hash(file_path: str) -> str:
     return hasher.hexdigest()
 
 
+def get_file_metadata(file_path: str) -> Dict[str, Any]:
+    """
+    Get file metadata (size, modified time) for sync tracking
+
+    Args:
+        file_path: Path to the file
+
+    Returns:
+        Dict with file_size and modified_time
+    """
+    stat = os.stat(file_path)
+    return {
+        "file_size": stat.st_size,
+        "modified_time": datetime.fromtimestamp(stat.st_mtime)
+    }
+
+
 def parse_fit_file(file_path: str) -> Dict[str, Any]:
     """
     Parse a single FIT file using fitparse library
@@ -199,7 +216,7 @@ def parse_fit_file(file_path: str) -> Dict[str, Any]:
     return data
 
 
-def insert_fit_data(parsed_data: Dict[str, Any], db_connection) -> int:
+def insert_fit_data(parsed_data: Dict[str, Any], db_connection, source: str = "manual") -> int:
     """
     Insert parsed FIT data into the database
 
@@ -223,6 +240,9 @@ def insert_fit_data(parsed_data: Dict[str, Any], db_connection) -> int:
     total_inserted = 0
 
     try:
+        # Get file metadata for sync tracking
+        metadata = get_file_metadata(file_path)
+
         # Check if file already imported
         cursor = db_connection.execute(
             "SELECT file_hash FROM imported_files WHERE file_hash = ?",
@@ -232,11 +252,13 @@ def insert_fit_data(parsed_data: Dict[str, Any], db_connection) -> int:
             logger.info(f"File already imported: {file_path}")
             return 0
 
-        # Insert file tracking record
+        # Insert file tracking record with sync metadata
         db_connection.execute(
-            """INSERT INTO imported_files (file_hash, file_path, file_type, record_count)
-               VALUES (?, ?, ?, ?)""",
-            (file_hash, file_path, 'fit', 0)  # Will update record_count later
+            """INSERT INTO imported_files
+               (file_hash, file_path, file_type, file_size, modified_time, source, record_count)
+               VALUES (?, ?, ?, ?, ?, ?, ?)""",
+            (file_hash, file_path, 'fit', metadata['file_size'],
+             metadata['modified_time'], source, 0)  # Will update record_count later
         )
 
         # Insert sleep records
