@@ -19,8 +19,8 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "resources": ["bin/*"],
-    "externalBin": ["bin/python_backend"],
+    "resources": [],
+    "externalBin": [],
     "copyright": "Copyright © 2025",
     "category": "Utility",
     "shortDescription": "Local wearable data analyzer",
@@ -46,13 +46,7 @@
     },
     "shell": {
       "open": true,
-      "scope": [
-        {
-          "name": "python_backend",
-          "cmd": "bin/python_backend",
-          "sidecar": true
-        }
-      ]
+      "scope": []
     }
   }
 }
