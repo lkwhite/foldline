@@ -1,19 +1,28 @@
 <script lang="ts">
 	import { apiGet } from '$lib/api';
+	import HeatmapChart from '$lib/components/HeatmapChart.svelte';
 
 	let metric = 'sleep_duration';
 	let startDate = '2024-01-01';
 	let endDate = '2025-01-01';
 	let heatmapData: any[] = [];
 	let loading = false;
+	let theme: 'light' | 'dark' = 'light';
 
 	const metricOptions = [
-		{ value: 'sleep_duration', label: 'Sleep Duration' },
-		{ value: 'resting_hr', label: 'Resting Heart Rate' },
-		{ value: 'hrv', label: 'HRV' },
-		{ value: 'stress', label: 'Stress' },
-		{ value: 'steps', label: 'Steps' }
+		{ value: 'sleep_duration', label: 'Sleep Duration', colorScale: 'Blues', unit: 'hours' },
+		{ value: 'resting_hr', label: 'Resting Heart Rate', colorScale: 'Reds', unit: 'bpm' },
+		{ value: 'hrv', label: 'HRV', colorScale: 'Greens', unit: 'ms' },
+		{ value: 'stress', label: 'Stress', colorScale: 'Reds', unit: 'level' },
+		{ value: 'steps', label: 'Steps', colorScale: 'Purples', unit: 'steps' }
 	];
+
+	$: selectedMetric = metricOptions.find((m) => m.value === metric);
+	$: chartTitle = selectedMetric ? `${selectedMetric.label} Calendar` : 'Heatmap';
+	$: colorScale = selectedMetric?.colorScale || 'Blues';
+	$: valueLabel = selectedMetric
+		? `${selectedMetric.label} (${selectedMetric.unit})`
+		: 'Value';
 
 	async function loadHeatmap() {
 		loading = true;
@@ -62,18 +71,21 @@
 
 	<div class="card visualization">
 		{#if loading}
-			<p>Loading heatmap data...</p>
-		{:else if heatmapData.length > 0}
-			<h3>Heatmap Preview (stub)</h3>
-			<p class="hint">
-				TODO: Add actual heatmap visualization using D3.js, Chart.js, or similar library
-			</p>
-			<div class="data-preview">
-				<p>Data points: {heatmapData.length}</p>
-				<pre>{JSON.stringify(heatmapData.slice(0, 5), null, 2)}</pre>
+			<div class="loading-state">
+				<p>Loading heatmap data...</p>
 			</div>
+		{:else if heatmapData.length > 0}
+			<HeatmapChart
+				data={heatmapData}
+				title={chartTitle}
+				{colorScale}
+				valueLabel={valueLabel}
+				{theme}
+			/>
 		{:else}
-			<p class="hint">Click "Load Heatmap" to visualize your data</p>
+			<div class="empty-state">
+				<p class="hint">Click "Load Heatmap" to visualize your data</p>
+			</div>
 		{/if}
 	</div>
 </div>
@@ -102,21 +114,17 @@
 		min-height: 400px;
 	}
 
+	.loading-state,
+	.empty-state {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 400px;
+		text-align: center;
+	}
+
 	.hint {
 		color: var(--color-text-secondary);
 		font-style: italic;
-	}
-
-	.data-preview {
-		margin-top: var(--spacing);
-		padding: var(--spacing);
-		background-color: var(--color-bg);
-		border-radius: var(--border-radius);
-	}
-
-	.data-preview pre {
-		color: var(--color-text-secondary);
-		font-size: 0.85rem;
-		overflow-x: auto;
 	}
 </style>
