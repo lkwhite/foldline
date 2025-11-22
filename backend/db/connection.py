@@ -51,7 +51,7 @@ class Database:
             self.connection = duckdb.connect(self.db_path)
             logger.info("Connected to DuckDB")
         else:
-            self.connection = sqlite3.connect(self.db_path)
+            self.connection = sqlite3.connect(self.db_path, check_same_thread=False)
             logger.info("Connected to SQLite")
 
         return self.connection

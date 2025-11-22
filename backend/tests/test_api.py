@@ -331,64 +331,217 @@ class TestMetricsCorrelation:
 
         assert response.status_code == 422
 
-    def test_correlation_with_two_metrics(self, client):
-        """Should return correlation data for two metrics"""
+    def test_correlation_with_insufficient_data(self, client):
+        """Should return 400 when there's insufficient data"""
         response = client.get(
             "/metrics/correlation"
             "?x_metric=sleep_duration"
-            "&y_metric=hrv"
+            "&y_metric=hrv_value"
         )
 
-        assert response.status_code == 200
+        assert response.status_code == 400
         data = response.json()
+        assert "Insufficient data" in data["detail"]
 
-        assert "x_values" in data
-        assert "y_values" in data
-        assert "dates" in data
-        assert "stats" in data
+    def test_correlation_with_invalid_metric(self, client):
+        """Should return 400 when metric name is invalid"""
+        response = client.get(
+            "/metrics/correlation"
+            "?x_metric=invalid_metric"
+            "&y_metric=hrv_value"
+        )
 
-    def test_correlation_stats_structure(self, client):
+        assert response.status_code == 400
+        data = response.json()
+        assert "Invalid x_metric" in data["detail"]
+
+    def test_correlation_with_two_metrics(self, temp_db):
+        """Should return correlation data for two metrics with sample data"""
+        from main import app
+        from fastapi.testclient import TestClient
+
+        # Insert sample data
+        temp_db.connect()
+        temp_db.initialize_schema()
+        conn = temp_db.connection
+
+        # Insert test data
+        for i in range(10):
+            date = f"2024-01-{i+10:02d}"
+            conn.execute(
+                "INSERT INTO sleep_records (date, duration_minutes, sleep_score) VALUES (?, ?, ?)",
+                (date, 420 + i * 10, 80 + i)
+            )
+            conn.execute(
+                "INSERT INTO hrv_records (date, hrv_value) VALUES (?, ?)",
+                (date, 50 + i * 2)
+            )
+        conn.commit()
+
+        # Override the global database for this test
+        import db.connection
+        original_db = db.connection._db_instance
+        db.connection._db_instance = temp_db
+
+        try:
+            client = TestClient(app)
+            response = client.get(
+                "/metrics/correlation"
+                "?x_metric=sleep_duration"
+                "&y_metric=hrv_value"
+            )
+
+            assert response.status_code == 200
+            data = response.json()
+
+            assert "x_values" in data
+            assert "y_values" in data
+            assert "dates" in data
+            assert "stats" in data
+
+            # Should have 10 data points
+            assert len(data["x_values"]) == 10
+            assert len(data["y_values"]) == 10
+            assert len(data["dates"]) == 10
+
+        finally:
+            # Restore original database
+            db.connection._db_instance = original_db
+
+    def test_correlation_stats_structure(self, temp_db):
         """Should return correlation statistics"""
-        response = client.get(
-            "/metrics/correlation"
-            "?x_metric=sleep_duration"
-            "&y_metric=resting_hr"
-        )
+        from main import app
+        from fastapi.testclient import TestClient
 
-        data = response.json()
-        stats = data["stats"]
+        # Insert sample data
+        temp_db.connect()
+        temp_db.initialize_schema()
+        conn = temp_db.connection
 
-        # Should include correlation coefficients
-        # Current stub includes:
-        assert "pearson_r" in stats
-        assert "pearson_p" in stats
-        # assert "spearman_r" in stats
-        # assert "n" in stats
+        for i in range(10):
+            date = f"2024-01-{i+10:02d}"
+            conn.execute(
+                "INSERT INTO sleep_records (date, duration_minutes, sleep_score) VALUES (?, ?, ?)",
+                (date, 420 + i * 10, 80 + i)
+            )
+            conn.execute(
+                "INSERT INTO resting_hr (date, resting_hr) VALUES (?, ?)",
+                (date, 60 + i)
+            )
+        conn.commit()
 
-    def test_correlation_with_lag(self, client):
-        """Should accept lag_days parameter"""
-        response = client.get(
-            "/metrics/correlation"
-            "?x_metric=sleep_duration"
-            "&y_metric=stress"
-            "&lag_days=1"
-        )
+        import db.connection
+        original_db = db.connection._db_instance
+        db.connection._db_instance = temp_db
 
-        assert response.status_code == 200
-        # When implemented, verify lag is applied correctly
+        try:
+            client = TestClient(app)
+            response = client.get(
+                "/metrics/correlation"
+                "?x_metric=sleep_duration"
+                "&y_metric=resting_hr"
+            )
 
-    def test_correlation_arrays_aligned(self, client):
+            data = response.json()
+            stats = data["stats"]
+
+            # Should include correlation coefficients
+            assert "pearson_r" in stats
+            assert "pearson_p" in stats
+            assert "spearman_r" in stats
+            assert "spearman_p" in stats
+            assert "n" in stats
+            assert stats["n"] == 10
+
+        finally:
+            db.connection._db_instance = original_db
+
+    def test_correlation_with_lag(self, temp_db):
+        """Should accept lag_days parameter and reduce data points accordingly"""
+        from main import app
+        from fastapi.testclient import TestClient
+
+        # Insert sample data
+        temp_db.connect()
+        temp_db.initialize_schema()
+        conn = temp_db.connection
+
+        for i in range(10):
+            date = f"2024-01-{i+10:02d}"
+            conn.execute(
+                "INSERT INTO sleep_records (date, duration_minutes) VALUES (?, ?)",
+                (date, 420 + i * 10)
+            )
+            conn.execute(
+                "INSERT INTO daily_stress (date, avg_stress) VALUES (?, ?)",
+                (date, 30 + i * 2)
+            )
+        conn.commit()
+
+        import db.connection
+        original_db = db.connection._db_instance
+        db.connection._db_instance = temp_db
+
+        try:
+            client = TestClient(app)
+            response = client.get(
+                "/metrics/correlation"
+                "?x_metric=sleep_duration"
+                "&y_metric=avg_stress"
+                "&lag_days=1"
+            )
+
+            assert response.status_code == 200
+            data = response.json()
+
+            # With lag_days=1, we should have 9 points (10 - 1)
+            assert len(data["x_values"]) == 9
+            assert len(data["y_values"]) == 9
+
+        finally:
+            db.connection._db_instance = original_db
+
+    def test_correlation_arrays_aligned(self, temp_db):
         """x_values, y_values, and dates should have same length"""
-        response = client.get(
-            "/metrics/correlation"
-            "?x_metric=steps"
-            "&y_metric=sleep_duration"
-        )
+        from main import app
+        from fastapi.testclient import TestClient
 
-        data = response.json()
+        # Insert sample data
+        temp_db.connect()
+        temp_db.initialize_schema()
+        conn = temp_db.connection
 
-        assert len(data["x_values"]) == len(data["y_values"])
-        assert len(data["x_values"]) == len(data["dates"])
+        for i in range(10):
+            date = f"2024-01-{i+10:02d}"
+            conn.execute(
+                "INSERT INTO daily_steps (date, step_count) VALUES (?, ?)",
+                (date, 8000 + i * 500)
+            )
+            conn.execute(
+                "INSERT INTO sleep_records (date, duration_minutes) VALUES (?, ?)",
+                (date, 420 + i * 10)
+            )
+        conn.commit()
+
+        import db.connection
+        original_db = db.connection._db_instance
+        db.connection._db_instance = temp_db
+
+        try:
+            client = TestClient(app)
+            response = client.get(
+                "/metrics/correlation"
+                "?x_metric=step_count"
+                "&y_metric=sleep_duration"
+            )
+
+            data = response.json()
+
+            assert len(data["x_values"]) == len(data["y_values"])
+            assert len(data["x_values"]) == len(data["dates"])
+
+        finally:
+            db.connection._db_instance = original_db
 
 
 class TestSettingsDataRoot:
