@@ -59,10 +59,12 @@ class Database:
     def initialize_schema(self):
         """
         Initialize database schema from schema.sql
-
-        TODO: Load and execute schema.sql
         """
         logger.info("Initializing database schema")
+
+        if not self.connection:
+            logger.error("No database connection available")
+            return
 
         schema_path = Path(__file__).parent / "schema.sql"
 
@@ -73,13 +75,18 @@ class Database:
         with open(schema_path) as f:
             schema_sql = f.read()
 
-        # TODO: Execute schema
-        # if USE_DUCKDB:
-        #     self.connection.execute(schema_sql)
-        # else:
-        #     self.connection.executescript(schema_sql)
+        try:
+            if USE_DUCKDB:
+                # DuckDB can execute multiple statements at once
+                self.connection.execute(schema_sql)
+            else:
+                # SQLite needs executescript for multiple statements
+                self.connection.executescript(schema_sql)
 
-        logger.info("Schema initialized")
+            logger.info("Schema initialized successfully")
+        except Exception as e:
+            logger.error(f"Failed to initialize schema: {e}")
+            raise
 
     def close(self):
         """Close database connection"""

@@ -58,6 +58,12 @@ class FitFolderRequest(BaseModel):
     folder_path: str
 
 
+class JsonFolderRequest(BaseModel):
+    """Request to import JSON files from GDPR export"""
+    folder_path: str
+    data_type: str = "sleep"  # "sleep", "daily_summaries", "all"
+
+
 class DataRootRequest(BaseModel):
     """Request to set the data root directory"""
     data_root: str
@@ -188,27 +194,134 @@ async def import_fit_folder(request: FitFolderRequest):
     4. Deduplicate based on file hash or activity ID
     5. Insert new records into DB
     6. Return summary
-
-    TODO: Implement actual directory walking and FIT parsing
     """
     logger.info(f"Importing FIT folder from: {request.folder_path}")
 
-    # TODO: Validate directory exists
-    # TODO: Walk directory tree using ingestion/fit_folder.py
-    # TODO: Parse FIT files
-    # TODO: Deduplicate and insert into DB
+    try:
+        import os
+        from db.connection import get_db
+        from ingestion.fit_folder import process_fit_folder
 
-    # Stub response
-    return ImportResponse(
-        success=True,
-        message="FIT folder imported successfully (stub)",
-        summary={
-            "files_found": 45,
-            "new_records": 32,
-            "duplicates_skipped": 13,
-            "date_range": "2024-01-01 to 2025-01-21"
-        }
-    )
+        # Validate directory exists
+        if not os.path.exists(request.folder_path):
+            raise HTTPException(status_code=400, detail=f"Directory not found: {request.folder_path}")
+
+        if not os.path.isdir(request.folder_path):
+            raise HTTPException(status_code=400, detail=f"Path is not a directory: {request.folder_path}")
+
+        # Get database connection
+        db = get_db()
+
+        # Process the FIT folder using our implementation
+        summary = process_fit_folder(request.folder_path, db.connection)
+
+        # Build success message
+        message = f"Processed {summary['files_found']} FIT files"
+        if summary['files_processed'] > 0:
+            message += f", inserted {summary['total_records']} records"
+        if summary['duplicates_skipped'] > 0:
+            message += f", skipped {summary['duplicates_skipped']} duplicates"
+        if summary['errors'] > 0:
+            message += f", {summary['errors']} errors"
+
+        return ImportResponse(
+            success=summary['errors'] == 0,
+            message=message,
+            summary={
+                "files_found": summary['files_found'],
+                "files_processed": summary['files_processed'],
+                "total_records": summary['total_records'],
+                "duplicates_skipped": summary['duplicates_skipped'],
+                "errors": summary['errors'],
+                "error_files": summary.get('error_files', [])
+            }
+        )
+
+    except Exception as e:
+        logger.error(f"Failed to import FIT folder {request.folder_path}: {e}")
+        raise HTTPException(status_code=500, detail=f"Import failed: {str(e)}")
+
+
+@app.post("/import/json-folder", response_model=ImportResponse)
+async def import_json_folder(request: JsonFolderRequest):
+    """
+    Import JSON files from Garmin GDPR export
+
+    Steps:
+    1. Validate folder exists
+    2. Scan for JSON files by type (sleep, daily summaries, etc.)
+    3. Parse and extract health metrics
+    4. Deduplicate and insert into appropriate tables
+    5. Return summary
+
+    Supported data_type values:
+    - "sleep": Process sleep_*.json files
+    - "daily_summaries": Process UdsFile_*.json files
+    - "all": Process all supported JSON types
+    """
+    logger.info(f"Importing JSON {request.data_type} files from: {request.folder_path}")
+
+    try:
+        import os
+        from db.connection import get_db
+        from ingestion.json_parser import process_sleep_json_files
+
+        # Validate directory exists
+        if not os.path.exists(request.folder_path):
+            raise HTTPException(status_code=400, detail=f"Directory not found: {request.folder_path}")
+
+        if not os.path.isdir(request.folder_path):
+            raise HTTPException(status_code=400, detail=f"Path is not a directory: {request.folder_path}")
+
+        # Get database connection
+        db = get_db()
+
+        summary = {"files_found": 0, "files_processed": 0, "total_records": 0,
+                  "duplicates_skipped": 0, "errors": 0, "error_files": []}
+
+        # Process based on data type
+        if request.data_type == "sleep" or request.data_type == "all":
+            sleep_summary = process_sleep_json_files(request.folder_path, db.connection)
+
+            # Aggregate sleep results
+            summary["files_found"] += sleep_summary["files_found"]
+            summary["files_processed"] += sleep_summary["files_processed"]
+            summary["total_records"] += sleep_summary["total_records"]
+            summary["duplicates_skipped"] += sleep_summary["duplicates_skipped"]
+            summary["errors"] += sleep_summary["errors"]
+            summary["error_files"].extend(sleep_summary.get("error_files", []))
+
+        # TODO: Add daily_summaries processing when request.data_type includes it
+        # if request.data_type == "daily_summaries" or request.data_type == "all":
+        #     daily_summary = process_daily_summary_json_files(request.folder_path, db.connection)
+        #     # Aggregate results...
+
+        # Build success message
+        message = f"Processed {summary['files_found']} JSON files"
+        if summary['files_processed'] > 0:
+            message += f", imported {summary['total_records']} records"
+        if summary['duplicates_skipped'] > 0:
+            message += f", skipped {summary['duplicates_skipped']} duplicates"
+        if summary['errors'] > 0:
+            message += f", {summary['errors']} errors"
+
+        return ImportResponse(
+            success=summary['errors'] == 0,
+            message=message,
+            summary={
+                "data_type": request.data_type,
+                "files_found": summary['files_found'],
+                "files_processed": summary['files_processed'],
+                "total_records": summary['total_records'],
+                "duplicates_skipped": summary['duplicates_skipped'],
+                "errors": summary['errors'],
+                "error_files": summary.get('error_files', [])
+            }
+        )
+
+    except Exception as e:
+        logger.error(f"Failed to import JSON folder {request.folder_path}: {e}")
+        raise HTTPException(status_code=500, detail=f"JSON import failed: {str(e)}")
 
 
 # ============================================================================
