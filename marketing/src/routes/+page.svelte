@@ -32,14 +32,14 @@
 <HeroSection
   title="Your physiological map, unfolded."
   subtitle="Foldline maps your wearable data the way topographic maps reveal terrain: clean, structured, understated, and precise."
-  ctaPrimary="Download for macOS"
-  ctaSecondary="View Documentation"
+  ctaPrimary="Get Foldline"
+  ctaSecondary="Learn how your data stays local"
   screenshotSrc="/screenshots/hero-dashboard.svg"
   screenshotAlt="Foldline dashboard showcasing clean data visualization"
 />
 
 <!-- Feature Blocks -->
-<section class="features">
+<section id="features" class="features">
   <FeatureBlock
     title="Heatmaps that reveal patterns"
     description="See your entire activity history at once. Calendar heatmaps make it easy to spot weekly rhythms, seasonal trends, and outliers across months of data."
