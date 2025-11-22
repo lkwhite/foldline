@@ -1,0 +1,158 @@
+/**
+ * Foldline Design System - Brand Tokens v0.1.0
+ * Minimal, technical, line-drawing aesthetic
+ */
+
+:root {
+  /* ============================================
+     COLOR SYSTEM - Neutral / Technical Palette
+     ============================================ */
+
+  /* Light Mode Colors */
+  --color-bg-light: #F7F5EF;        /* Paper Ivory */
+  --color-text-light: #111111;      /* Ink Black */
+  --color-text-secondary-light: #666666;
+  --line-color-light: #DCD8CA;      /* Fog Line */
+
+  /* Dark Mode Colors */
+  --color-bg-dark: #0C0D0E;         /* Graphite Night */
+  --color-text-dark: #F8F8F8;       /* Soft Ink */
+  --color-text-secondary-dark: #A0A0A0;
+  --line-color-dark: #3E3E3F;       /* Fog Line Dark */
+
+  /* Accent - Constant across themes */
+  --color-accent: #E69F00;          /* Okabe–Ito Orange */
+  --color-accent-hover: #CC8C00;
+
+  /* Active Theme Variables (default: light) */
+  --color-bg: var(--color-bg-light);
+  --color-text: var(--color-text-light);
+  --color-text-secondary: var(--color-text-secondary-light);
+  --line-color: var(--line-color-light);
+
+  /* ============================================
+     SPACING SYSTEM - 8pt Grid
+     ============================================ */
+
+  --space-xs: 4px;
+  --space-s: 8px;
+  --space-m: 16px;
+  --space-l: 24px;
+  --space-xl: 32px;
+  --space-xxl: 48px;
+
+  /* ============================================
+     STROKE & BORDERS
+     ============================================ */
+
+  --stroke-weight: 1.25px;
+  --border-radius-small: 2px;
+  --border-radius-medium: 4px;
+
+  /* ============================================
+     SHADOWS
+     ============================================ */
+
+  /* Screenshot shadows - very subtle */
+  --shadow-screenshot-light: 0 10px 40px rgba(0, 0, 0, 0.06);
+  --shadow-screenshot-hover-light: 0 14px 48px rgba(0, 0, 0, 0.08);
+
+  --shadow-screenshot-dark: 0 10px 40px rgba(0, 0, 0, 0.3);
+  --shadow-screenshot-hover-dark: 0 14px 48px rgba(0, 0, 0, 0.4);
+
+  --shadow-screenshot: var(--shadow-screenshot-light);
+  --shadow-screenshot-hover: var(--shadow-screenshot-hover-light);
+
+  /* ============================================
+     MOTION
+     ============================================ */
+
+  --transition-duration: 200ms;
+  --transition-easing: cubic-bezier(0.25, 0.1, 0.25, 1);
+
+  /* ============================================
+     LAYOUT
+     ============================================ */
+
+  --container-max-width: 1280px;
+  --container-max-width-wide: 1400px;
+  --nav-height: 64px;
+
+  /* ============================================
+     Z-INDEX SCALE
+     ============================================ */
+
+  --z-base: 0;
+  --z-theme-toggle: 50;
+  --z-nav: 100;
+  --z-modal: 200;
+  --z-tooltip: 300;
+}
+
+/* ============================================
+   DARK MODE THEME
+   ============================================ */
+
+html.dark {
+  --color-bg: var(--color-bg-dark);
+  --color-text: var(--color-text-dark);
+  --color-text-secondary: var(--color-text-secondary-dark);
+  --line-color: var(--line-color-dark);
+  --shadow-screenshot: var(--shadow-screenshot-dark);
+  --shadow-screenshot-hover: var(--shadow-screenshot-hover-dark);
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.line-border {
+  border: var(--stroke-weight) solid var(--line-color);
+}
+
+.line-border-top {
+  border-top: var(--stroke-weight) solid var(--line-color);
+}
+
+.line-border-bottom {
+  border-bottom: var(--stroke-weight) solid var(--line-color);
+}
+
+.line-separator {
+  width: 100%;
+  height: var(--stroke-weight);
+  background-color: var(--line-color);
+  margin: var(--space-xxl) 0;
+}
+
+/* Screenshot container utility */
+.screenshot-container {
+  position: relative;
+  border-radius: var(--border-radius-small);
+  box-shadow: var(--shadow-screenshot);
+  transition:
+    transform var(--transition-duration) var(--transition-easing),
+    box-shadow var(--transition-duration) var(--transition-easing);
+}
+
+.screenshot-container:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-screenshot-hover);
+}
+
+/* ============================================
+   RESPONSIVE UTILITIES
+   ============================================ */
+
+@media (max-width: 768px) {
+  :root {
+    --container-padding: var(--space-m);
+    --nav-height: 56px;
+  }
+}
+
+@media (min-width: 769px) {
+  :root {
+    --container-padding: var(--space-xl);
+  }
+}

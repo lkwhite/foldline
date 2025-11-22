@@ -1,0 +1,274 @@
+/**
+ * Foldline Design System - Linework Utilities v0.1.0
+ * Line-drawing motifs, borders, and structural elements
+ */
+
+/* ============================================
+   LINE UTILITIES
+   ============================================ */
+
+.line {
+  stroke: var(--line-color);
+  stroke-width: var(--stroke-weight);
+  fill: none;
+}
+
+.line-accent {
+  stroke: var(--color-accent);
+  stroke-width: var(--stroke-weight);
+  fill: none;
+}
+
+/* ============================================
+   BORDER UTILITIES
+   ============================================ */
+
+.border-line {
+  border: var(--stroke-weight) solid var(--line-color);
+}
+
+.border-t-line {
+  border-top: var(--stroke-weight) solid var(--line-color);
+}
+
+.border-b-line {
+  border-bottom: var(--stroke-weight) solid var(--line-color);
+}
+
+.border-l-line {
+  border-left: var(--stroke-weight) solid var(--line-color);
+}
+
+.border-r-line {
+  border-right: var(--stroke-weight) solid var(--line-color);
+}
+
+/* ============================================
+   SEPARATOR LINES
+   ============================================ */
+
+.separator-horizontal {
+  width: 100%;
+  height: var(--stroke-weight);
+  background-color: var(--line-color);
+  margin: var(--space-xxl) 0;
+  border: none;
+}
+
+.separator-vertical {
+  width: var(--stroke-weight);
+  height: 100%;
+  background-color: var(--line-color);
+  margin: 0 var(--space-l);
+}
+
+/* Thin separator variant */
+.separator-thin {
+  margin: var(--space-l) 0;
+}
+
+/* ============================================
+   FOLD LINE MOTIFS
+   ============================================ */
+
+.fold-line-bg {
+  position: relative;
+  overflow: hidden;
+}
+
+.fold-line-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 19px,
+    var(--line-color) 19px,
+    var(--line-color) calc(19px + var(--stroke-weight)),
+    transparent calc(19px + var(--stroke-weight)),
+    transparent 40px
+  );
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.fold-line-bg > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================
+   MAP OUTLINE MOTIFS
+   ============================================ */
+
+.map-outline {
+  position: relative;
+}
+
+.map-outline::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40%;
+  height: 120%;
+  border: var(--stroke-weight) solid var(--line-color);
+  border-radius: var(--border-radius-small);
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ============================================
+   GRID TICKS (subtle background pattern)
+   ============================================ */
+
+.grid-ticks {
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 39px,
+      var(--line-color) 39px,
+      var(--line-color) 40px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 39px,
+      var(--line-color) 39px,
+      var(--line-color) 40px
+    );
+  opacity: 0.2;
+}
+
+/* ============================================
+   BUTTONS WITH LINE STYLING
+   ============================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  font-family: var(--font-family);
+  font-size: var(--type-body-small);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--border-radius-medium);
+  cursor: pointer;
+  transition:
+    background-color var(--transition-duration) var(--transition-easing),
+    border-color var(--transition-duration) var(--transition-easing),
+    color var(--transition-duration) var(--transition-easing),
+    transform var(--transition-duration) var(--transition-easing);
+  text-decoration: none;
+  border: none;
+}
+
+/* CTA Button - Orange fill */
+.btn-cta {
+  background-color: var(--color-accent);
+  color: #ffffff;
+  border: none;
+}
+
+.btn-cta:hover {
+  background-color: var(--color-accent-hover);
+  transform: translateY(-1px);
+}
+
+/* Secondary Button - Line outline */
+.btn-secondary {
+  background-color: transparent;
+  color: var(--color-text);
+  border: var(--stroke-weight) solid var(--line-color);
+}
+
+.btn-secondary:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+/* ============================================
+   CARDS & CONTAINERS
+   ============================================ */
+
+.card {
+  background-color: var(--color-bg);
+  border: var(--stroke-weight) solid var(--line-color);
+  border-radius: var(--border-radius-medium);
+  padding: var(--space-l);
+}
+
+.card-minimal {
+  border: none;
+  border-top: var(--stroke-weight) solid var(--line-color);
+  border-radius: 0;
+  padding: var(--space-l) 0;
+}
+
+/* ============================================
+   SVG LINE ANIMATIONS
+   ============================================ */
+
+@keyframes dash-flow {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: 40;
+  }
+}
+
+.line-animated {
+  stroke-dasharray: 20 20;
+  animation: dash-flow 2s linear infinite;
+}
+
+/* ============================================
+   HOVER STATES FOR INTERACTIVE ELEMENTS
+   ============================================ */
+
+.line-hover {
+  transition: stroke var(--transition-duration) var(--transition-easing);
+}
+
+.line-hover:hover {
+  stroke: var(--color-accent);
+}
+
+/* Brightness increase on hover (for screenshots/images) */
+.brightness-hover {
+  transition:
+    filter var(--transition-duration) var(--transition-easing),
+    transform var(--transition-duration) var(--transition-easing);
+}
+
+.brightness-hover:hover {
+  filter: brightness(1.05);
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+
+@media (max-width: 768px) {
+  .btn {
+    padding: 10px 20px;
+    font-size: var(--type-body-small);
+  }
+
+  .separator-horizontal {
+    margin: var(--space-l) 0;
+  }
+
+  .card {
+    padding: var(--space-m);
+  }
+}

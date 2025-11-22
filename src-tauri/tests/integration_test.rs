@@ -10,8 +10,6 @@
 
 #[cfg(test)]
 mod tests {
-    use std::time::Duration;
-    use tokio::time::sleep;
 
     /// Test that port allocation works correctly
     #[tokio::test]
@@ -99,7 +97,8 @@ mod tests {
     #[test]
     fn test_command_args() {
         let port = 8500;
-        let args = vec!["--port", &port.to_string()];
+        let port_str = port.to_string();
+        let args = vec!["--port", &port_str];
 
         assert_eq!(args[0], "--port");
         assert_eq!(args[1], "8500");

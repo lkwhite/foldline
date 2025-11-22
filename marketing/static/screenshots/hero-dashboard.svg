@@ -1,0 +1,20 @@
+<svg width="1200" height="800" viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1200" height="800" fill="#F7F5EF"/>
+
+  <!-- Border -->
+  <rect x="1" y="1" width="1198" height="798" stroke="#DCD8CA" stroke-width="2" fill="none"/>
+
+  <!-- Placeholder text -->
+  <text x="600" y="380" font-family="Inter, sans-serif" font-size="32" fill="#666666" text-anchor="middle">
+    Hero Dashboard Screenshot
+  </text>
+  <text x="600" y="430" font-family="Inter, sans-serif" font-size="18" fill="#999999" text-anchor="middle">
+    1200 × 800 px
+  </text>
+
+  <!-- Decorative fold lines -->
+  <line x1="300" y1="0" x2="300" y2="800" stroke="#DCD8CA" stroke-width="1.25"/>
+  <line x1="600" y1="0" x2="600" y2="800" stroke="#DCD8CA" stroke-width="1.25"/>
+  <line x1="900" y1="0" x2="900" y2="800" stroke="#DCD8CA" stroke-width="1.25"/>
+</svg>

@@ -6,13 +6,16 @@
     "dev": "npm run dev:backend & npm run dev:frontend",
     "dev:backend": "cd backend && python3 main.py --port 8000",
     "dev:frontend": "cd frontend && npm run dev",
+    "dev:marketing": "cd marketing && npm run dev",
     "tauri:dev": "cd src-tauri && cargo tauri dev",
     "tauri:build": "cd src-tauri && cargo tauri build",
     "build": "npm run build:frontend && npm run build:backend && npm run tauri:build",
     "build:frontend": "cd frontend && npm run build",
+    "build:marketing": "cd marketing && npm run build",
     "build:backend": "cd backend && pyinstaller --name python_backend --onefile main.py",
-    "install:all": "npm run install:frontend && npm run install:backend",
+    "install:all": "npm run install:frontend && npm run install:marketing && npm run install:backend",
     "install:frontend": "cd frontend && npm install",
+    "install:marketing": "cd marketing && npm install",
     "install:backend": "cd backend && pip install -r requirements.txt"
   },
   "repository": {
