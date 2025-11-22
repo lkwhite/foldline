@@ -10,8 +10,6 @@
 
 #[cfg(test)]
 mod tests {
-    use std::time::Duration;
-    use tokio::time::sleep;
 
     /// Test that port allocation works correctly
     #[tokio::test]
