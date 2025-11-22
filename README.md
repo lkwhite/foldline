@@ -331,7 +331,7 @@ Current focus areas:
 - ✅ API validation (request/response contracts)
 - ✅ Process management (backend spawning, cleanup)
 
-See `TESTING_PLAN.md` for detailed testing strategy.
+See `docs/TESTING_PLAN.md` for detailed testing strategy.
 
 ## Packaging Python Backend
 
@@ -426,17 +426,17 @@ Foldline uses DuckDB (or SQLite) for local data storage.
 - [ ] Power user features (annotations, predictions)
 - [ ] Multi-vendor support (Whoop, Oura, Apple Watch)
 
-**For detailed planning:** See [PRE_COMMERCIAL_MVP_PLAN.md](PRE_COMMERCIAL_MVP_PLAN.md)
+**For detailed planning:** See [PRE_COMMERCIAL_MVP_PLAN.md](docs/PRE_COMMERCIAL_MVP_PLAN.md)
 
 ## Documentation
 
-📚 **[DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md)** - Complete guide to all project documentation
+📚 **[DOCUMENTATION_INDEX.md](docs/DOCUMENTATION_INDEX.md)** - Complete guide to all project documentation
 
 **Key docs:**
-- **[PRE_COMMERCIAL_MVP_PLAN.md](PRE_COMMERCIAL_MVP_PLAN.md)** - Current 5-6 week roadmap
-- **[CONTINUAL_SYNC_SPEC.md](CONTINUAL_SYNC_SPEC.md)** - Sync architecture and UX
-- **[TESTING_PLAN.md](TESTING_PLAN.md)** - Testing strategy
-- **[FOLDLINE_HANDOFF.md](FOLDLINE_HANDOFF.md)** - Algorithm reference (from gar-mining)
+- **[PRE_COMMERCIAL_MVP_PLAN.md](docs/PRE_COMMERCIAL_MVP_PLAN.md)** - Current 5-6 week roadmap
+- **[CONTINUAL_SYNC_SPEC.md](docs/CONTINUAL_SYNC_SPEC.md)** - Sync architecture and UX
+- **[TESTING_PLAN.md](docs/TESTING_PLAN.md)** - Testing strategy
+- **[FOLDLINE_HANDOFF.md](docs/FOLDLINE_HANDOFF.md)** - Algorithm reference (from gar-mining)
 
 ## Contributing
 
