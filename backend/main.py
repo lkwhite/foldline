@@ -446,28 +446,115 @@ async def get_correlation_data(
 
     Returns aligned values for scatter plots and correlation stats
 
-    TODO: Implement actual correlation analysis
+    Args:
+        x_metric: First metric name (e.g., 'sleep_duration', 'resting_hr')
+        y_metric: Second metric name
+        lag_days: Days to offset y_metric relative to x_metric (default 0)
+                  For sleep→next-day correlations, use lag_days=1
+
+    Note: Sleep data is attributed to the date sleep ENDED (Garmin convention).
+    To correlate sleep with NEXT-day performance, use lag_days=1.
+    Example: sleep_duration on Nov 21 with lag_days=1 correlates with
+             resting_hr on Nov 22 (next day's performance).
     """
     logger.info(f"Calculating correlation: {x_metric} vs {y_metric} (lag={lag_days})")
 
-    # TODO: Query both metrics from DB
-    # TODO: Align by date with optional lag
-    # TODO: Calculate Pearson/Spearman correlation
-    # TODO: Return scatter data and stats
+    from db.connection import get_db
+    import numpy as np
+    from scipy import stats
 
-    # Stub response
-    return CorrelationResponse(
-        x_values=[1.0, 2.0, 3.0, 4.0, 5.0],
-        y_values=[2.0, 4.0, 6.0, 8.0, 10.0],
-        dates=["2024-01-01", "2024-01-02", "2024-01-03", "2024-01-04", "2024-01-05"],
-        stats={
-            "pearson_r": 0.95,
-            "pearson_p": 0.001,
-            "spearman_r": 0.93,
-            "spearman_p": 0.002,
-            "n": 5
-        }
-    )
+    # Get database connection
+    db = get_db()
+    conn = db.connection
+
+    # Valid metrics from daily_metrics view
+    valid_metrics = [
+        'sleep_duration', 'sleep_score',
+        'resting_hr', 'hrv_value',
+        'avg_stress', 'max_stress', 'min_stress',
+        'step_count'
+    ]
+
+    if x_metric not in valid_metrics:
+        raise HTTPException(status_code=400, detail=f"Invalid x_metric: {x_metric}")
+    if y_metric not in valid_metrics:
+        raise HTTPException(status_code=400, detail=f"Invalid y_metric: {y_metric}")
+
+    try:
+        # Query data from daily_metrics view
+        query = f"""
+        SELECT date, {x_metric}, {y_metric}
+        FROM daily_metrics
+        WHERE {x_metric} IS NOT NULL AND {y_metric} IS NOT NULL
+        ORDER BY date
+        """
+
+        cursor = conn.cursor()
+        cursor.execute(query)
+        rows = cursor.fetchall()
+
+        if len(rows) < 2:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Insufficient data for correlation (need at least 2 points, found {len(rows)})"
+            )
+
+        # Extract data
+        dates = [row[0] for row in rows]
+        x_values = [float(row[1]) for row in rows]
+        y_values = [float(row[2]) for row in rows]
+
+        # Apply lag offset if specified
+        if lag_days != 0:
+            if lag_days > 0:
+                # Positive lag: shift y_values forward in time
+                # This correlates x_metric on date D with y_metric on date D+lag
+                # Example: sleep on Nov 21 (x) correlates with stress on Nov 22 (y)
+                y_values = y_values[lag_days:]
+                x_values = x_values[:-lag_days]
+                dates = dates[:-lag_days]
+            else:
+                # Negative lag: shift x_values forward
+                lag_abs = abs(lag_days)
+                x_values = x_values[lag_abs:]
+                y_values = y_values[:-lag_abs]
+                dates = dates[lag_abs:]
+
+        # Check we still have enough data after lag
+        if len(x_values) < 2:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Insufficient data after applying lag_days={lag_days}"
+            )
+
+        # Calculate correlation statistics
+        x_array = np.array(x_values)
+        y_array = np.array(y_values)
+
+        # Pearson correlation (measures linear relationship)
+        pearson_r, pearson_p = stats.pearsonr(x_array, y_array)
+
+        # Spearman correlation (measures monotonic relationship)
+        spearman_r, spearman_p = stats.spearmanr(x_array, y_array)
+
+        return CorrelationResponse(
+            x_values=x_values,
+            y_values=y_values,
+            dates=dates,
+            stats={
+                "pearson_r": float(pearson_r),
+                "pearson_p": float(pearson_p),
+                "spearman_r": float(spearman_r),
+                "spearman_p": float(spearman_p),
+                "n": len(x_values)
+            }
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Correlation calculation failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Correlation calculation failed: {str(e)}")
 
 
 # ============================================================================
