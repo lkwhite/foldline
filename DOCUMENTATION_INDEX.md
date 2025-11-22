@@ -6,6 +6,19 @@ Quick reference guide to all documentation in the Foldline project.
 
 ---
 
+## 📢 Recent Changes (2025-11-22)
+
+**Documentation Consolidation:**
+- ✅ Moved `FOLDLINE_DESIGN_SPEC.md` to `design/` directory
+- ✅ Archived `IMPLEMENTATION_PLAN.md`, `VIEWS_ROADMAP_ASSESSMENT.md`, and `payment_planning.md`
+- ✅ Moved legacy test scripts from root to `tools/dev-scripts/`
+- ✅ Updated all references to use `PAYMENT_ARCHITECTURE.md` instead of `payment_planning.md`
+- ✅ Enhanced archive documentation with complete document history
+
+**Why:** Reduce clutter in root directory, consolidate related docs, and clarify active vs. archived documentation.
+
+---
+
 ## 📋 Start Here
 
 ### New to Foldline?
@@ -128,32 +141,66 @@ Quick reference guide to all documentation in the Foldline project.
 
 ---
 
-#### [payment_planning.md](payment_planning.md)
+#### [PAYMENT_ARCHITECTURE.md](PAYMENT_ARCHITECTURE.md)
 **Status:** 🟡 DEFERRED - Still relevant for commercial launch
-**Purpose:** Payment system and licensing plan
+**Purpose:** Payment system and licensing architecture
 **Use For:** Commercial launch preparation (post-MVP)
 
 **Key Contents:**
-- Lemon Squeezy integration tasks (1-8)
-- Pay-what-you-want model
+- Lemon Squeezy integration architecture
+- Pay-what-you-want model details
 - License activation flow
-- EFF donation tracking (10% net revenue)
+- Free vs. Premium feature matrix
+- Privacy-first payment approach
 
-**Timeline:** Week 7-10 (after pre-commercial MVP beta testing)
+**Timeline:** Post pre-commercial MVP (after beta testing)
 
 ---
 
-## 📁 Design & Architecture (if exists)
+#### [EFF_DONATIONS.md](EFF_DONATIONS.md)
+**Status:** 🟢 ACTIVE - Ongoing commitment
+**Purpose:** EFF donation commitment and tracking methodology
+**Use For:** Understanding revenue allocation and donation calculations
+
+**Key Contents:**
+- 10% net revenue commitment to EFF
+- Revenue calculation methodology
+- Donation tracking tools (in `tools/donations/`)
+- Transparency and reporting approach
+
+**Why EFF:** Aligns with Foldline's privacy-first principles
+
+---
+
+## 📁 Design & Architecture
 
 ### [design/FOLDLINE_DESIGN_SPEC.md](design/FOLDLINE_DESIGN_SPEC.md)
-**Status:** 🟢 ACTIVE (if exists)
+**Status:** 🟢 ACTIVE
 **Purpose:** Design system, UI patterns, component library
 **Use For:** Building consistent UI components
 
+**Key Contents:**
+- Brand essence and visual philosophy
+- Logo system and usage guidelines
+- Color system and design tokens
+- Typography and layout principles
+- Component specifications
+
+### [design/](design/)
+**Status:** 🟢 ACTIVE - Design system directory
+**Contains:**
+- `FOLDLINE_DESIGN_SPEC.md` - Main design specification
+- `BRAND_TOKENS.css` - CSS design tokens (source of truth)
+- `TYPOGRAPHY.css` - Font definitions
+- `ACCESSIBILITY.md` - Accessibility guidelines
+- `COMPONENT_STATES.md` - Component state specifications
+- `DATA_TABLES.md`, `DATA_VISUALIZATION.md`, `FORMS.md` - Component guides
+- `FILE_CONSOLIDATION_STRATEGY.md` - Design token management strategy
+
 ### [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md)
-**Status:** 🟢 ACTIVE (if exists)
+**Status:** 🟢 ACTIVE
 **Purpose:** Directory structure and organization
-**Use For:** Understanding codebase layout
+**Use For:** Understanding codebase layout (Frontend, Marketing, Backend separation)
 
 ---
 
@@ -162,23 +209,29 @@ Quick reference guide to all documentation in the Foldline project.
 ### [docs/archive/](docs/archive/)
 **Status:** 🔴 ARCHIVED - Historical reference only
 
-Contains superseded planning documents:
+**Integration Planning Suite (4 documents):**
 - **INTEGRATION_PLAN.md** - Original 6-phase roadmap
 - **INTEGRATION_ROADMAP.md** - Original week-by-week guide
 - **INTEGRATION_ANALYSIS.md** - Original gap analysis
 - **INTEGRATION_SUMMARY.md** - Original executive summary
 
+**Feature Planning Documents (3 documents):**
+- **IMPLEMENTATION_PLAN.md** - Fitness tracking features implementation plan
+- **VIEWS_ROADMAP_ASSESSMENT.md** - Visualization views assessment
+- **payment_planning.md** - Original payment planning (superseded by PAYMENT_ARCHITECTURE.md)
+
 **Why Archived:**
-- Assumed commercial launch as MVP (now pre-commercial)
-- Did not include Garmin Express sync
-- Consolidated into PRE_COMMERCIAL_MVP_PLAN.md
+- Integration docs: Assumed commercial launch as MVP (now pre-commercial), didn't include Garmin Express sync
+- Feature docs: Point-in-time planning completed or outdated
+- Payment docs: Superseded by more comprehensive PAYMENT_ARCHITECTURE.md
 
 **Still Useful For:**
 - Reference on advanced analytics algorithms
 - Understanding planning evolution
+- Historical context for decision-making
 - Post-commercial roadmap ideas
 
-**See:** [docs/archive/README.md](docs/archive/README.md) for details
+**See:** [docs/archive/README.md](docs/archive/README.md) for complete details and document history
 
 ---
 
@@ -205,11 +258,19 @@ Contains superseded planning documents:
 - 🟢 [PRE_COMMERCIAL_MVP_PLAN.md](PRE_COMMERCIAL_MVP_PLAN.md) - Acceptance criteria per week
 
 ### Payment & Licensing
-- 🟡 [payment_planning.md](payment_planning.md) - Deferred to commercial launch
+- 🟡 [PAYMENT_ARCHITECTURE.md](PAYMENT_ARCHITECTURE.md) - Payment system architecture (deferred to commercial launch)
+- 🟢 [EFF_DONATIONS.md](EFF_DONATIONS.md) - EFF donation commitment
+- 🔴 [docs/archive/payment_planning.md](docs/archive/payment_planning.md) - Original payment planning (archived)
 
 ### Design & UX
 - 🟢 [CONTINUAL_SYNC_SPEC.md](CONTINUAL_SYNC_SPEC.md) - Sync UX requirements (§8)
-- 🟢 [design/FOLDLINE_DESIGN_SPEC.md](design/FOLDLINE_DESIGN_SPEC.md) - Design system (if exists)
+- 🟢 [design/FOLDLINE_DESIGN_SPEC.md](design/FOLDLINE_DESIGN_SPEC.md) - Design system
+- 🟢 [design/](design/) - Complete design system directory
+
+### Development Tools
+- 🟢 [tools/dev-scripts/](tools/dev-scripts/) - Legacy test and debugging scripts
+- 🟢 [tools/donations/](tools/donations/) - EFF donation tracking tools
+- 🟢 [scripts/](scripts/) - Build and development scripts
 
 ---
 
@@ -277,7 +338,7 @@ Contains superseded planning documents:
 → Deferred to post-MVP, see [FOLDLINE_HANDOFF.md](FOLDLINE_HANDOFF.md) lines 744-2612
 
 **...Payment system**
-→ Deferred to commercial launch, see [payment_planning.md](payment_planning.md)
+→ Deferred to commercial launch, see [PAYMENT_ARCHITECTURE.md](PAYMENT_ARCHITECTURE.md)
 
 ---
 

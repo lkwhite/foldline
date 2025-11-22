@@ -77,6 +77,48 @@ These four documents were created to plan the integration of gar-mining function
 
 ---
 
+### Feature Planning Documents (Archived 2025-11-22)
+
+These documents provided specific feature implementation plans and assessments during active development.
+
+#### 5. IMPLEMENTATION_PLAN.md
+**Original Purpose:** Detailed implementation plan for fitness tracking features (Daily Summaries, VO2 Max, Menstrual Health, Body Composition)
+
+**Contents:**
+- Phase-by-phase implementation guide
+- Database schema status
+- API endpoint requirements
+- Parsing and processing tasks
+
+**Why Archived:** Feature-specific tactical plan that has been completed or integrated into current sprint work
+
+---
+
+#### 6. VIEWS_ROADMAP_ASSESSMENT.md
+**Original Purpose:** Assessment of visualization views and data architecture status
+
+**Contents:**
+- View inventory and feature sets
+- Implementation status matrix
+- Supported metrics documentation
+- Roadmap priorities
+
+**Why Archived:** Point-in-time assessment that is now outdated as development has progressed
+
+---
+
+#### 7. payment_planning.md
+**Original Purpose:** Payment system implementation planning (prompt-style document)
+
+**Contents:**
+- Lemon Squeezy integration requirements
+- License activation flow
+- EFF donation tracking tasks
+
+**Why Archived:** Superseded by `PAYMENT_ARCHITECTURE.md` which provides more comprehensive payment architecture documentation. Payment implementation deferred to post-MVP commercial launch.
+
+---
+
 ## Why These Were Superseded
 
 ### Context Change: Pre-Commercial MVP
@@ -110,11 +152,13 @@ The original four documents had overlapping content:
 - **Context:** Understanding how the plan evolved
 - **Comparison:** Original vs. updated priorities
 - **Completeness:** Full 6-phase roadmap (useful for post-commercial planning)
+- **Feature Details:** Specific implementation notes for completed features
 
 ### ❌ Don't Use For:
 - **Current implementation guidance** → Use `PRE_COMMERCIAL_MVP_PLAN.md`
 - **Timeline planning** → Use `PRE_COMMERCIAL_MVP_PLAN.md`
 - **Priority decisions** → Use `PRE_COMMERCIAL_MVP_PLAN.md`
+- **Payment system** → Use `PAYMENT_ARCHITECTURE.md`
 
 ---
 
@@ -125,17 +169,21 @@ For current planning, see:
 - **`CONTINUAL_SYNC_SPEC.md`** - Sync architecture and UX requirements
 - **`FOLDLINE_HANDOFF.md`** - Source material from gar-mining (algorithms, patterns)
 - **`TESTING_PLAN.md`** - Testing strategy (still applicable)
-- **`payment_planning.md`** - Payment system plan (deferred to commercial launch)
+- **`PAYMENT_ARCHITECTURE.md`** - Payment system architecture (deferred to commercial launch)
+- **`EFF_DONATIONS.md`** - EFF donation commitment and tracking
 
 ---
 
 ## Document History
 
-| Document | Created | Archived | Replaced By |
-|----------|---------|----------|-------------|
+| Document | Created | Archived | Replaced By / Status |
+|----------|---------|----------|---------------------|
 | INTEGRATION_PLAN.md | 2025-11-22 | 2025-11-22 | PRE_COMMERCIAL_MVP_PLAN.md |
 | INTEGRATION_ROADMAP.md | 2025-11-22 | 2025-11-22 | PRE_COMMERCIAL_MVP_PLAN.md |
 | INTEGRATION_ANALYSIS.md | 2025-11-22 | 2025-11-22 | PRE_COMMERCIAL_MVP_PLAN.md |
 | INTEGRATION_SUMMARY.md | 2025-11-22 | 2025-11-22 | PRE_COMMERCIAL_MVP_PLAN.md |
+| IMPLEMENTATION_PLAN.md | 2025-11-22 | 2025-11-22 | Integrated into sprint work |
+| VIEWS_ROADMAP_ASSESSMENT.md | 2025-11-22 | 2025-11-22 | Outdated assessment |
+| payment_planning.md | 2025-11-22 | 2025-11-22 | PAYMENT_ARCHITECTURE.md |
 
-**Note:** These documents were created and archived on the same day because the strategy shifted during the documentation process after CONTINUAL_SYNC_SPEC.md was introduced.
+**Note:** Documents are preserved for historical context and reference, but should not be used for current implementation guidance.
