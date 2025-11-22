@@ -21,11 +21,11 @@ Foldline’s line-drawing framework exists only to support rich, interactive dat
 ## 2. **Logo System**
 
 ### **Primary Logo (Simple Line Outline)**
-- Tall, USGS-inspired folded-map silhouette (1:3 ratio).  
-- 1.25–1.5 px stroke weight (scaled for device pixel density).  
-- 2–4 vertical fold lines.  
-- No heatmap interior — purely structural.  
-- Corners: extremely slight rounding (2–3 px @ 1x).  
+- Tall, USGS-inspired folded-map silhouette (1:3 ratio).
+- **1.25 px stroke weight** (consistent with all line-drawing elements).
+- 2–4 vertical fold lines.
+- No heatmap interior — purely structural.
+- Corners: extremely slight rounding (2 px @ 1x).
 - No shading, no fills.
 
 ### **Light / Dark Variants**
@@ -103,9 +103,10 @@ Foldline’s line-drawing framework exists only to support rich, interactive dat
 - XXL: 48  
 
 ### **Grid**
-- 12-column responsive grid  
-- Max width: 1280–1400 px  
-- Mobile → single column  
+- 12-column responsive grid
+- **Max width**: 1280 px (standard for marketing and most app views)
+- **Max width**: 1400 px (optional for data-heavy dashboard views requiring extra horizontal space)
+- Mobile → single column
 - Tablet: 6-column
 
 ---
@@ -122,8 +123,8 @@ Foldline’s line-drawing framework exists only to support rich, interactive dat
 - No gradients, textures, or heavy shadows
 
 ### **Hero Section**
-- Left: text → logo small, H1, subtext, CTA(s)  
-- Right: billboard-style screenshot with very soft shadow (blur 8–12px, opacity ~5%)  
+- Left: text → logo small, H1, subtext, CTA(s)
+- Right: billboard-style screenshot with very soft shadow (see Screenshot Presentation Rules)
 - No frames around screenshot
 
 ### **Motifs**  
@@ -154,13 +155,14 @@ All motifs must feel structural, not decorative.
 
 ### ✔ Screenshots are the product.
 
-**Rules**  
-- Always placed large (~70% width desktop)  
-- Always orthographic (never angled)  
-- Soft shadow only (blur 10–12px, 5–8% opacity)  
-- No frames or borders  
-- Generous whitespace around them  
-- Hover: small lift + brightness increase
+**Rules**
+- Always placed large (~70% width desktop)
+- Always orthographic (never angled)
+- **Shadow**: `0 10px 40px rgba(0, 0, 0, 0.06)` (desktop), `0 6px 24px rgba(0, 0, 0, 0.05)` (mobile)
+- **Hover shadow**: `0 12px 48px rgba(0, 0, 0, 0.08)`
+- No frames or borders
+- Generous whitespace around them
+- **Hover**: `translateY(-4px)` + `filter: brightness(1.05)`
 
 ### **Multi-screenshot Sections**
 - Even vertical rhythm  
@@ -172,12 +174,12 @@ All motifs must feel structural, not decorative.
 ## 9. **Interactive Data UI Spec (app)**
 
 ### **Charts**
-- Thin grid lines  
-- Minimal axes  
-- Accent orange for highlights  
-- No bold outlines  
-- Hover → line brightens by 10–15%  
-- Motion: fade/slide, no bounce
+- Thin grid lines
+- Minimal axes
+- Accent orange for highlights
+- No bold outlines
+- **Hover** → `filter: brightness(1.15)`
+- **Motion**: fade/slide (150-250ms), no bounce
 
 ### **Heatmaps**
 - Low-contrast cells  
@@ -220,9 +222,9 @@ All motifs must feel structural, not decorative.
 ## 12. **Assets Claude Can Generate**
 
 ### **Logo (SVG)**
-- 1:3 tall map outline  
-- 2–4 fold lines  
-- 1.5px stroke  
+- 1:3 tall map outline
+- 2–4 fold lines
+- **1.25px stroke** (consistent with all line-drawing elements)
 - Two exports: light & dark
 
 ### **Icons**
