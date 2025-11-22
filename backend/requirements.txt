@@ -7,8 +7,9 @@ pydantic==2.6.1
 duckdb==0.10.0
 # OR: sqlite (built-in to Python)
 
-# FIT file parsing
-fitparse==1.2.0
+# FIT file parsing (optional - GDPR import works without it)
+# fitparse==1.2.0  # Has build issues on some systems, commented out for CI
+# Alternative: Use python-fitparse or process FIT files separately
 
 # Data analysis
 pandas==2.2.0

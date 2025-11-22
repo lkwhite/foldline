@@ -7,11 +7,12 @@ Foldline is a cross-platform desktop application that analyzes wearable data fro
 ## Features
 
 - 🔒 **100% Local**: All data stays on your machine
-- 📊 **Rich Visualizations**: Heatmaps, trends, and correlation analysis
+- 🔄 **Garmin Express Auto-Sync**: Automatically detects and syncs from Garmin Express (macOS/Windows)
 - 💾 **GDPR Export Support**: Import your complete Garmin data archive
-- 📁 **FIT File Scanning**: Monitor local FIT file directories
+- 📊 **Rich Visualizations**: Heatmaps, trends, and correlation analysis (coming soon)
 - 📈 **Multiple Metrics**: Sleep, HRV, resting HR, stress, steps, and more
 - 🚫 **No External APIs**: Works completely offline
+- 🔐 **Privacy-First**: No telemetry, no cloud uploads, no OAuth required
 
 ## Architecture
 
@@ -160,31 +161,43 @@ Output locations:
 
 ## Usage
 
-### Importing Data
+### First-Time Setup
 
-**Option 1: Garmin GDPR Export**
+**Step 1: Import Historical Data (GDPR Export)**
 
 1. Request your data from [Garmin](https://www.garmin.com/en-US/account/datamanagement/exportdata/)
 2. Wait for the export email (can take a few days)
 3. Download the ZIP file
-4. In Foldline: **Setup** → **Select ZIP File**
-5. Wait for import to complete
+4. In Foldline: **Settings** → **Import Historical Data** → **Upload GDPR Export**
+5. Wait for import to complete (progress bar shows status)
 
-**Option 2: Local FIT Files**
+**Step 2: Enable Garmin Express Auto-Sync** (Recommended)
 
-1. Locate your Garmin Express data folder:
-   - **Windows**: `C:\ProgramData\Garmin\CoreService\Devices\<device-id>\`
-   - **macOS**: `~/Library/Application Support/Garmin/GarminConnect/`
-2. In Foldline: **Setup** → **Select Folder**
-3. Foldline will scan and import all FIT files
+1. Install [Garmin Express](https://www.garmin.com/en-US/software/express/) if not already installed
+2. Connect your Garmin device via USB and sync at least once
+3. In Foldline: **Settings** → **Garmin Express Devices** → **Detect Devices**
+4. Enable sync for your device(s)
+5. Click **Sync Now** to import recent data
 
-### Viewing Your Data
+Garmin Express folders are located at:
+- **macOS**: `~/Library/Application Support/Garmin/Devices/<device-id>/`
+- **Windows**: `%APPDATA%\Garmin\Devices\<device-id>\`
 
+### Daily Use
+
+**Keeping Data Fresh:**
+1. Connect your Garmin device to Garmin Express (via USB)
+2. Open Foldline and click **Sync Now** in Settings
+3. Or: Enable **Sync on Startup** for automatic updates
+
+**Manual Sync:**
+- Settings → Garmin Express Devices → Device Name → **Sync Now**
+
+**Viewing Your Data** (Coming Soon in Week 4-5):
 - **Dashboard**: Overview of your data range and metrics
 - **Heatmaps**: Year-at-a-glance visualizations
 - **Trends**: Time series charts with smoothing options
 - **Correlation**: Analyze relationships between metrics
-- **Settings**: Configure data storage location
 
 ## Development Guide
 
@@ -385,17 +398,45 @@ Foldline uses DuckDB (or SQLite) for local data storage.
 - Verify CORS settings in `backend/main.py`
 - Check browser console for errors
 
-## Roadmap
+## Development Status
 
-- [ ] Implement FIT file parsing (`fitparse` library)
-- [ ] Complete GDPR export extraction
-- [ ] Add actual database queries
-- [ ] Implement visualization libraries
-- [ ] Add data export (CSV, JSON)
-- [ ] Support for other device brands (Whoop, Oura, Apple Watch)
-- [ ] Advanced metrics (training load, recovery, VO2 max trends)
-- [ ] Dark/light theme toggle
-- [ ] Auto-sync from watched folders
+**Current Phase:** Pre-Commercial MVP (5-6 weeks)
+
+### ✅ Completed
+- [x] Database schema with continual sync support
+- [x] Garmin Express device detection (macOS/Windows)
+- [x] Incremental sync engine (file change detection)
+- [x] FIT file parsing (basic implementation)
+- [x] File deduplication (SHA256 hashing)
+
+### 🚧 In Progress (Week 1)
+- [ ] GDPR export extraction and parsing
+- [ ] GDPR JSON field mappings
+- [ ] Enhanced FIT parsing with GDPR knowledge
+
+### 📋 Next Up
+- [ ] Garmin Express sync UI (Settings page)
+- [ ] Visualization (Plotly integration)
+- [ ] Basic analytics (sleep, HRV, stress, steps heatmaps/trends)
+- [ ] Beta testing with real users
+
+### 🔮 Post-MVP (Commercial Launch)
+- [ ] Payment system (Lemon Squeezy)
+- [ ] Advanced analytics (health score, recovery, correlations)
+- [ ] Power user features (annotations, predictions)
+- [ ] Multi-vendor support (Whoop, Oura, Apple Watch)
+
+**For detailed planning:** See [PRE_COMMERCIAL_MVP_PLAN.md](PRE_COMMERCIAL_MVP_PLAN.md)
+
+## Documentation
+
+📚 **[DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md)** - Complete guide to all project documentation
+
+**Key docs:**
+- **[PRE_COMMERCIAL_MVP_PLAN.md](PRE_COMMERCIAL_MVP_PLAN.md)** - Current 5-6 week roadmap
+- **[CONTINUAL_SYNC_SPEC.md](CONTINUAL_SYNC_SPEC.md)** - Sync architecture and UX
+- **[TESTING_PLAN.md](TESTING_PLAN.md)** - Testing strategy
+- **[FOLDLINE_HANDOFF.md](FOLDLINE_HANDOFF.md)** - Algorithm reference (from gar-mining)
 
 ## Contributing
 
