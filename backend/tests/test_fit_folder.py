@@ -188,7 +188,7 @@ class TestProcessFitFolder:
 
         assert isinstance(result, dict)
         assert "files_found" in result
-        assert "new_records" in result
+        assert "total_records" in result
         assert "duplicates_skipped" in result
 
     def test_process_empty_folder(self, temp_dir, temp_db):
@@ -197,7 +197,7 @@ class TestProcessFitFolder:
 
         # Current implementation returns zeros (TODO)
         assert result["files_found"] == 0
-        assert result["new_records"] == 0
+        assert result["total_records"] == 0
         assert result["duplicates_skipped"] == 0
 
     def test_process_with_fit_files(self, temp_dir, temp_db):
