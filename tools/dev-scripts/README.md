@@ -22,4 +22,4 @@ For the current test suite, see:
 - `frontend/src/lib/*.test.ts` - Frontend tests (Vitest)
 - `src-tauri/tests/` - Tauri integration tests
 
-See `TESTING_PLAN.md` for the comprehensive testing strategy.
+See `../../docs/TESTING_PLAN.md` for the comprehensive testing strategy.

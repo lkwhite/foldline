@@ -205,7 +205,7 @@ When making changes to the design system:
 4. Update version number when releasing
 5. Test changes across light/dark modes
 6. Verify accessibility compliance
-7. Update `DOCUMENTATION_INDEX.md` if adding new files
+7. Update `../docs/DOCUMENTATION_INDEX.md` if adding new files
 
 ---
 

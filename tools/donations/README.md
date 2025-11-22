@@ -154,5 +154,5 @@ The script tries to handle different column names. If it fails:
 
 ## See Also
 
-- [EFF_DONATIONS.md](../../EFF_DONATIONS.md) - Full donation plan documentation
-- [PAYMENT_ARCHITECTURE.md](../../PAYMENT_ARCHITECTURE.md) - Payment system overview
+- [EFF_DONATIONS.md](../../docs/EFF_DONATIONS.md) - Full donation plan documentation
+- [PAYMENT_ARCHITECTURE.md](../../docs/PAYMENT_ARCHITECTURE.md) - Payment system overview
