@@ -14,6 +14,22 @@ CREATE TABLE IF NOT EXISTS config (
 -- Store app settings like data_root, last_sync_time, etc.
 
 -- ============================================================================
+-- Garmin Express Device Tracking (for auto-sync)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS garmin_express_devices (
+    device_id TEXT PRIMARY KEY,
+    device_path TEXT NOT NULL,
+    device_name TEXT,
+    enabled BOOLEAN DEFAULT TRUE,
+    last_sync_at TIMESTAMP,
+    file_count INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_garmin_express_enabled ON garmin_express_devices(enabled);
+
+-- ============================================================================
 -- File Tracking (for deduplication)
 -- ============================================================================
 
@@ -21,9 +37,18 @@ CREATE TABLE IF NOT EXISTS imported_files (
     file_hash TEXT PRIMARY KEY,
     file_path TEXT NOT NULL,
     file_type TEXT NOT NULL,  -- 'fit', 'tcx', 'json', 'zip'
+    file_size BIGINT,
+    modified_time TIMESTAMP,
+    first_seen_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     imported_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    record_count INTEGER DEFAULT 0
+    source TEXT DEFAULT 'manual',  -- 'gdpr', 'garmin_express', 'manual'
+    record_count INTEGER DEFAULT 0,
+    last_error TEXT
 );
+
+CREATE INDEX IF NOT EXISTS idx_imported_files_source ON imported_files(source);
+CREATE INDEX IF NOT EXISTS idx_imported_files_modified ON imported_files(modified_time);
+CREATE INDEX IF NOT EXISTS idx_imported_files_type ON imported_files(file_type);
 
 -- ============================================================================
 -- Sleep Data
