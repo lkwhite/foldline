@@ -1,165 +1,383 @@
-# EFF Donations Plan
+# EFF Donation Plan
 
-Foldline is a privacy-first, local-only application. We believe that user autonomy over their own data should be the norm, not an exception. As a small but concrete way to support that principle, we intend to donate a portion of Foldline revenue to the **Electronic Frontier Foundation (EFF)**.
+## Commitment
 
-This document describes how we plan to calculate, track, and act on those donations.
+**Foldline donates 10% of net revenue to the Electronic Frontier Foundation (EFF).**
+
+The EFF defends digital privacy, free expression, and innovation. Since Foldline is built on privacy-first principles — your physiological data never leaves your device — supporting the EFF aligns with our values.
+
+**This donation is:**
+- **Transparent**: Documented publicly in this repository
+- **Manual**: We calculate and donate ourselves (no automated third-party split)
+- **Net revenue**: After platform fees, before taxes and business expenses
 
 ---
 
 ## Why the EFF?
 
-The EFF has a long track record of:
+The EFF fights for:
+- **Privacy rights**: Defending against mass surveillance and data collection
+- **User control**: Advocating for software that respects user autonomy
+- **Open standards**: Supporting interoperability and avoiding vendor lock-in
 
-- Defending privacy, security, and digital civil liberties  
-- Pushing back against surveillance and abusive data practices  
-- Supporting open standards, encryption, and user control over technology  
+Foldline embodies these principles by:
+- Processing all data locally (no cloud sync)
+- Exporting data in open formats (FIT, CSV, JSON)
+- Avoiding telemetry and tracking
 
-Foldline’s entire premise—giving people deep, local visibility into data that usually lives in someone else’s cloud—is philosophically aligned with that mission.
+Supporting the EFF is our way of contributing to the broader ecosystem that makes privacy-respecting software possible.
 
----
-
-## Donation Target
-
-Our **current, non-binding target** is:
-
-> Donate 10% of net revenue from Foldline to the EFF.
-
-“Net revenue” here is a simple operational definition, not an accounting audit standard. It’s meant to be easy to reason about and easy to calculate.
+**Learn more**: [eff.org](https://www.eff.org)
 
 ---
 
-## Working Definition of Net Revenue
+## Revenue Calculation Methodology
 
-For a given period (e.g. a month or quarter):
+### Definitions
 
-1. **Gross Revenue**  
-   Total paid by customers for Foldline in the period, taken from a Lemon Squeezy (or other platform) CSV export.
+| Term | Definition |
+|------|------------|
+| **Gross Revenue** | Total payment received from customers (before any fees) |
+| **Platform Fees** | Lemon Squeezy transaction fees + payment processor fees |
+| **Net Revenue** | Gross Revenue − Platform Fees |
+| **EFF Donation Target** | 10% of Net Revenue |
 
-2. **Platform / Processing Fees**  
-   Fees charged by payment processors or by the platform itself.  
-   If exact per-transaction fees are not available, we will use:
-   - Fee fields from the CSV (if present), or  
-   - A conservative flat percentage documented in this repo.
+### Why Net Revenue?
 
-3. **Net Revenue**  
-   Defined as:
+- **Gross revenue** includes fees we never actually receive (Lemon Squeezy keeps ~5% + payment processor fees)
+- **Net revenue** reflects the actual money that reaches our bank account
+- **Before taxes/expenses**: We donate based on revenue, not profit, to ensure consistency regardless of business costs
 
-   **Net Revenue = Gross Revenue − Platform / Processing Fees**
+### Example Calculation
 
-4. **EFF Donation**  
-   Defined as:
+```
+Gross Revenue (month):    $10,000
+Platform Fees (5.5%):     −$550
+─────────────────────────────────
+Net Revenue:              $9,450
 
-   **EFF Donation = 10% × Net Revenue**
-
-This definition may evolve as needed; all changes will be documented here.
-
----
-
-## Workflow for Calculating Donations
-
-### 1. Export Revenue Data
-
-At the end of each period:
-
-1. Log in to the payment platform (e.g. Lemon Squeezy).
-2. Export a CSV of all Foldline transactions for that period.
-3. Save it locally under a path like:
-
-`tools/donations/data/foldline_revenue_YYYY_MM.csv`
-
-These CSVs **must not** be committed to the public repository because they may contain customer information.
+EFF Donation (10%):       $945
+```
 
 ---
 
-### 2. Run the Donation Calculator Script
+## Monthly Donation Workflow
 
-A small script under `tools/donations/` will:
+### Step 1: Export Revenue Data from Lemon Squeezy
 
-- Parse the CSV for the period
-- Sum gross revenue
-- Estimate or read platform fees
-- Compute:
-  - Gross revenue
-  - Fees
-  - Net revenue
-  - 10% donation target
+1. Log in to Lemon Squeezy dashboard
+2. Navigate to **Reports** → **Transactions**
+3. Set date range (e.g., "Last month" or custom range)
+4. Export as **CSV**
+5. Save to `tools/donations/data/YYYY-MM-revenue.csv`
 
-Example usage (exact command may change once implemented):
+**Expected CSV columns**:
+- `Date`
+- `Order ID`
+- `Customer Email` (optional, can be redacted)
+- `Gross Amount`
+- `Fee Amount`
+- `Net Amount`
+
+### Step 2: Run Donation Calculator Script
 
 ```bash
 cd tools/donations
-python calculate_eff_donation.py data/foldline_revenue_2025_01.csv
+python calculate_donation.py data/YYYY-MM-revenue.csv
 ```
 
-Example output:
+**Output**:
+```
+Foldline EFF Donation Calculator
+─────────────────────────────────
+Period: 2025-01-01 to 2025-01-31
 
-```text
-Period: 2025-01
-Gross revenue:      $3,420.00
-Estimated fees:     $ 205.20
-Net revenue:        $3,214.80
+Gross Revenue:     $10,000.00
+Platform Fees:     $550.00
+Net Revenue:       $9,450.00
 
-EFF donation (10% of net): $321.48
+EFF Donation (10%): $945.00
+─────────────────────────────────
+```
+
+### Step 3: Make Donation to EFF
+
+1. Visit [eff.org/donate](https://www.eff.org/donate)
+2. Enter the calculated amount (e.g., $945)
+3. Use payment method (credit card, PayPal, etc.)
+4. Save receipt to `tools/donations/receipts/YYYY-MM-receipt.pdf`
+
+### Step 4: Record Donation in Ledger
+
+Add entry to `tools/donations/ledger.csv`:
+
+```csv
+Date,Period,Gross Revenue,Platform Fees,Net Revenue,Donation Amount,Receipt
+2025-02-01,2025-01,10000.00,550.00,9450.00,945.00,receipts/2025-01-receipt.pdf
 ```
 
 ---
 
-### 3. Make the Donation
+## Automation (Future Enhancement)
 
-The donation itself is **manual**:
+### GitHub Actions for Monthly Reports
 
-1. Go to https://www.eff.org/donate  
-2. Enter the computed donation amount  
-3. Complete the donation  
+Potential workflow:
 
-We may record donation receipts privately for bookkeeping but will not publish any customer-identifying data.
+```yaml
+# .github/workflows/eff-donation-reminder.yml
+name: Monthly EFF Donation Reminder
+
+on:
+  schedule:
+    - cron: '0 9 1 * *'  # 9am on the 1st of each month
+
+jobs:
+  reminder:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create GitHub Issue
+        run: |
+          gh issue create \
+            --title "Monthly EFF Donation - $(date +%Y-%m)" \
+            --body "Time to calculate and donate 10% of last month's revenue to the EFF."
+```
+
+### Lemon Squeezy API Integration
+
+Instead of manual CSV export:
+
+```python
+import requests
+import os
+from datetime import datetime, timedelta
+
+# Fetch last month's transactions via API
+api_key = os.getenv("LEMONSQUEEZY_API_KEY")
+store_id = os.getenv("LEMONSQUEEZY_STORE_ID")
+
+# Calculate date range
+end_date = datetime.now().replace(day=1) - timedelta(days=1)
+start_date = end_date.replace(day=1)
+
+# Call Lemon Squeezy API
+response = requests.get(
+    f"https://api.lemonsqueezy.com/v1/orders",
+    headers={"Authorization": f"Bearer {api_key}"},
+    params={
+        "filter[store_id]": store_id,
+        "filter[created_at][gte]": start_date.isoformat(),
+        "filter[created_at][lte]": end_date.isoformat(),
+    }
+)
+
+# Parse and calculate (see tools/donations/calculate_donation.py)
+```
+
+**Note**: Requires API key with read-only access to orders. Not implemented in MVP to avoid storing secrets.
 
 ---
 
-## Transparency
+## Transparency & Public Reporting
 
-This plan is:
+### Annual Summary
 
-- A good-faith commitment  
-- Not a legal obligation  
-- Subject to future refinement  
+At the end of each year, publish:
+- **Total gross revenue**
+- **Total platform fees**
+- **Total net revenue**
+- **Total EFF donations**
+- **Receipts** (anonymized, amounts only)
 
-If the definition of “net revenue,” the donation percentage, or the timing changes, we will:
+Location: `tools/donations/annual-reports/YYYY-summary.md`
 
-- Update this document
-- Explain why the change was made
+### Example Annual Report
 
-We may occasionally publish a simple high-level statement like “We donated $X to the EFF in 20YY.”
+```markdown
+# Foldline EFF Donations - 2025 Summary
+
+| Month | Gross Revenue | Platform Fees | Net Revenue | EFF Donation |
+|-------|---------------|---------------|-------------|--------------|
+| Jan   | $10,000       | $550          | $9,450      | $945         |
+| Feb   | $12,000       | $660          | $11,340     | $1,134       |
+| ...   | ...           | ...           | ...         | ...          |
+| **Total** | **$120,000** | **$6,600** | **$113,400** | **$11,340** |
+
+All receipts available in `tools/donations/receipts/2025-*.pdf`.
+```
+
+### Optional: Public Dashboard
+
+If Foldline grows, consider:
+- Simple HTML page at `foldline.app/eff-donations`
+- Shows running total and links to annual reports
+- Builds trust with privacy-conscious users
+
+---
+
+## Ledger Schema
+
+**File**: `tools/donations/ledger.csv`
+
+**Columns**:
+```csv
+Date,Period,Gross Revenue,Platform Fees,Net Revenue,Donation Amount,Receipt,Notes
+```
+
+**Example**:
+```csv
+Date,Period,Gross Revenue,Platform Fees,Net Revenue,Donation Amount,Receipt,Notes
+2025-02-01,2025-01,10000.00,550.00,9450.00,945.00,receipts/2025-01-receipt.pdf,First month post-launch
+2025-03-01,2025-02,12000.00,660.00,11340.00,1134.00,receipts/2025-02-receipt.pdf,
+```
+
+**Notes column** for:
+- Special circumstances (e.g., refunds, chargebacks)
+- Donations rounded up voluntarily
+- Platform fee changes
+
+---
+
+## Edge Cases & Exceptions
+
+### What if there are refunds?
+
+- **Deduct refunds from gross revenue** for that period
+- Lemon Squeezy CSV should show refunds as negative amounts
+- Script automatically handles this
+
+### What if we lose money in a month?
+
+- If net revenue is negative (more refunds than sales), **donation is $0** for that month
+- No "donation debt" carried forward
+
+### What if we want to donate more?
+
+- Rounding up to the nearest $10 or $100 is encouraged
+- Record actual donation amount in ledger
+- Note in "Notes" column: "Rounded up from $X to $Y"
+
+### What about payment processor disputes?
+
+- Treat disputes as refunds until resolved
+- If dispute is won later, include in that month's revenue
+- Document in "Notes" column
+
+---
+
+## Tax Considerations
+
+**Disclaimer**: Consult a tax professional for your jurisdiction.
+
+### U.S. Tax Implications
+
+- EFF donations are **tax-deductible** as charitable contributions (EFF is a 501(c)(3))
+- Keep all receipts for tax filings
+- Report donations separately from business expenses
+
+### International Considerations
+
+- Tax deductibility varies by country
+- Some jurisdictions may not recognize U.S. 501(c)(3) status
+- May need equivalent privacy rights organization in your country
+
+---
+
+## Tools in This Repository
+
+### `tools/donations/calculate_donation.py`
+
+**Usage**:
+```bash
+python tools/donations/calculate_donation.py data/2025-01-revenue.csv
+```
+
+**Output**:
+- Gross revenue total
+- Platform fees total
+- Net revenue
+- 10% donation amount
+
+**Options**:
+- `--platform-fee-rate 5.5`: Override default fee percentage
+- `--output json`: Output JSON for automation
+
+### `tools/donations/ledger.csv`
+
+**Permanent record** of all donations.
+
+### `tools/donations/data/`
+
+**Storage** for monthly Lemon Squeezy CSV exports (gitignored to protect customer data).
+
+### `tools/donations/receipts/`
+
+**Storage** for EFF donation receipts (gitignored for privacy).
 
 ---
 
 ## Privacy Considerations
 
-- CSV exports may contain emails or other personal information.  
-- These files should be:
-  - Stored locally  
-  - Excluded via `.gitignore`  
-  - Never uploaded or shared  
+To protect customer privacy:
 
-The donation calculator script must operate only on local files and must never send data to external services.
+**Gitignore entries**:
+```gitignore
+# Donation data (contains customer emails/info)
+tools/donations/data/*.csv
+
+# Donation receipts (may contain personal info)
+tools/donations/receipts/*.pdf
+
+# Keep the ledger (aggregated, no PII)
+!tools/donations/ledger.csv
+```
+
+**Script behavior**:
+- Never sends data to external services
+- Operates only on local files
+- Does not log customer-identifying information
 
 ---
 
-## Future Enhancements
+## FAQ
 
-Optional improvements include:
+### Why not automate the donation itself?
 
-- A CLI tool to summarize multiple periods  
-- GitHub Actions (private repos only) for donation reporting  
-- A small UI section in Foldline showing “We donate 10% to EFF”  
-- A way for users to independently support EFF
+- **Accountability**: Manual donations ensure we review the numbers each month
+- **Flexibility**: Allows rounding up or adjusting for special circumstances
+- **Simplicity**: Avoids complex API integrations and third-party services
+
+### Why 10%?
+
+- **Significant but sustainable**: Enough to make an impact without jeopardizing the business
+- **Round number**: Easy to calculate and communicate
+- **Common standard**: Many businesses donate 5-10% of revenue or profit
+
+### Can users opt out?
+
+No — the 10% donation is part of Foldline's mission, not a user-selectable option. However:
+- **It's transparent**: Users know before purchasing
+- **It's efficient**: Comes from our revenue, not added to the price
+- **It's aligned**: Privacy-focused users often support the EFF already
+
+### What if Foldline becomes very profitable?
+
+- **10% remains the target** regardless of scale
+- If revenue exceeds significant thresholds, consider:
+  - Increasing to 15-20%
+  - Supporting additional privacy/open-source organizations
+  - Creating a Foldline Foundation for broader privacy advocacy
 
 ---
 
 ## Summary
 
-- Our goal is to donate ~10% of net revenue to the EFF.  
-- Net revenue = gross revenue − fees.  
-- Donations are calculated via local CSV exports and a simple script.  
-- The actual donation is made manually.  
-- We maintain this plan as part of Foldline’s commitment to user privacy and digital rights.
+✅ **Transparent**: Public ledger and annual reports
+✅ **Simple**: Monthly CSV → script → donate → record
+✅ **Accountable**: Manual process with clear documentation
+✅ **Aligned**: Supports organizations defending privacy rights
+✅ **Sustainable**: 10% of net revenue, not gross
+
+**Next donation due**: 1st of each month (for previous month's revenue)
+
+**Questions?** See `PAYMENT_ARCHITECTURE.md` for revenue tracking details.

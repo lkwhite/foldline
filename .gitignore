@@ -25,6 +25,11 @@ frontend/.env.local
 node_modules/
 /package-lock.json
 
+# Environment variables (root level)
+.env
+.env.local
+.env.*.local
+
 # IDE
 .vscode/
 .idea/
@@ -50,3 +55,9 @@ yarn-error.log*
 
 # OS
 Thumbs.db
+
+# Donation data (contains customer PII - never commit)
+tools/donations/data/*.csv
+tools/donations/receipts/*.pdf
+# Keep the ledger (aggregated, no PII)
+!tools/donations/ledger.csv

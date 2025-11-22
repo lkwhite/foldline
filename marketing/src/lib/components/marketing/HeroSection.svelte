@@ -29,8 +29,8 @@
         <p class="hero-subtitle">{subtitle}</p>
 
         <div class="hero-ctas">
-          <button class="btn btn-cta">{ctaPrimary}</button>
-          <button class="btn btn-secondary">{ctaSecondary}</button>
+          <a href="/buy" class="btn btn-cta">{ctaPrimary}</a>
+          <a href="#features" class="btn btn-secondary">{ctaSecondary}</a>
         </div>
       </div>
 

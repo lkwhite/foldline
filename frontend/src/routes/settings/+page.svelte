@@ -2,12 +2,29 @@
 	import { apiGet, apiPost } from '$lib/api';
 	import { selectDataRoot } from '$lib/fileDialog';
 	import { onMount } from 'svelte';
+	import { license } from '$lib/stores/license';
+	import LicenseActivationModal from '$lib/components/LicenseActivationModal.svelte';
 
 	let status: any = null;
 	let dataRoot = '';
 	let loading = true;
 	let saving = false;
 	let message = '';
+	let showLicenseModal = false;
+
+	function handleChangeLicense() {
+		showLicenseModal = true;
+	}
+
+	function handleDeactivate() {
+		if (confirm('Are you sure you want to deactivate your license? You can reactivate it later.')) {
+			license.deactivate();
+		}
+	}
+
+	function handleLicenseActivated() {
+		showLicenseModal = false;
+	}
 
 	onMount(async () => {
 		try {
@@ -96,6 +113,47 @@
 				</div>
 			</div>
 
+			<div class="card">
+				<h2>License</h2>
+				<p class="description">
+					Manage your Foldline license activation.
+				</p>
+
+				<div class="status-grid">
+					<div class="status-item">
+						<span class="label">Status:</span>
+						<span class:activated={$license.isActivated}>
+							{$license.isActivated ? '✓ Activated' : 'Not activated'}
+						</span>
+					</div>
+					{#if $license.isActivated}
+						<div class="status-item">
+							<span class="label">License Key:</span>
+							<span class="license-key">{license.getMaskedKey($license.licenseKey || '')}</span>
+						</div>
+						<div class="status-item">
+							<span class="label">Activated:</span>
+							<span>{new Date($license.activatedAt || '').toLocaleDateString()}</span>
+						</div>
+					{/if}
+				</div>
+
+				<div class="button-group">
+					{#if $license.isActivated}
+						<button on:click={handleChangeLicense} class="btn-secondary">
+							Change License
+						</button>
+						<button on:click={handleDeactivate} class="btn-danger">
+							Deactivate
+						</button>
+					{:else}
+						<button on:click={handleChangeLicense} class="btn-primary">
+							Activate License
+						</button>
+					{/if}
+				</div>
+			</div>
+
 			<div class="card info-card">
 				<h2>About Data Storage</h2>
 				<p>
@@ -110,6 +168,12 @@
 		</div>
 	{/if}
 </div>
+
+<LicenseActivationModal
+	bind:show={showLicenseModal}
+	allowSkip={$license.isActivated}
+	on:activated={handleLicenseActivated}
+/>
 
 <style>
 	.settings-section {
@@ -183,5 +247,75 @@
 
 	.info-card p:last-child {
 		margin-bottom: 0;
+	}
+
+	/* License section styles */
+	.button-group {
+		display: flex;
+		gap: 8px;
+		margin-top: var(--spacing);
+	}
+
+	.button-group button {
+		flex: 1;
+	}
+
+	.btn-primary {
+		background-color: var(--color-accent, #E69F00);
+		color: #ffffff;
+		padding: 10px 20px;
+		border: none;
+		border-radius: var(--border-radius-medium, 4px);
+		cursor: pointer;
+		font-weight: var(--font-weight-medium, 500);
+		transition: background-color var(--transition-duration, 200ms) var(--transition-easing, ease);
+	}
+
+	.btn-primary:hover {
+		background-color: var(--color-accent-hover, #d18e00);
+	}
+
+	.btn-secondary {
+		background-color: transparent;
+		color: var(--color-text);
+		padding: 10px 20px;
+		border: var(--stroke-weight, 1px) solid var(--line-color);
+		border-radius: var(--border-radius-medium, 4px);
+		cursor: pointer;
+		font-weight: var(--font-weight-medium, 500);
+		transition: border-color var(--transition-duration, 200ms) var(--transition-easing, ease);
+	}
+
+	.btn-secondary:hover {
+		border-color: var(--color-accent, #E69F00);
+		color: var(--color-accent, #E69F00);
+	}
+
+	.btn-danger {
+		background-color: transparent;
+		color: #ff3b30;
+		padding: 10px 20px;
+		border: var(--stroke-weight, 1px) solid rgba(255, 59, 48, 0.3);
+		border-radius: var(--border-radius-medium, 4px);
+		cursor: pointer;
+		font-weight: var(--font-weight-medium, 500);
+		transition: all var(--transition-duration, 200ms) var(--transition-easing, ease);
+	}
+
+	.btn-danger:hover {
+		border-color: #ff3b30;
+		background-color: rgba(255, 59, 48, 0.1);
+	}
+
+	.license-key {
+		font-family: 'Inter', monospace;
+		font-variant-numeric: tabular-nums;
+		letter-spacing: 0.05em;
+		color: var(--color-text);
+	}
+
+	.activated {
+		color: var(--color-accent, #E69F00);
+		font-weight: var(--font-weight-medium, 500);
 	}
 </style>

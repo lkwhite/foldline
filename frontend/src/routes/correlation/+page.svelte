@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { apiGet } from '$lib/api';
+	import FeatureGate from '$lib/components/FeatureGate.svelte';
 	import ScatterPlot from '$lib/components/ScatterPlot.svelte';
 
 	let xMetric = 'sleep_duration';
@@ -60,6 +61,7 @@
 <div class="container">
 	<h1>Correlation Analysis</h1>
 
+	<FeatureGate feature="correlation_analysis" fallback="inline">
 	<div class="card controls">
 		<div class="control-group">
 			<label for="x-metric">X-Axis Metric:</label>
@@ -152,6 +154,7 @@
 			<p class="hint">Select two metrics and click "Analyze" to see correlation</p>
 		</div>
 	{/if}
+	</FeatureGate>
 </div>
 
 <style>
