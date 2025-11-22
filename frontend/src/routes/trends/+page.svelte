@@ -1,19 +1,27 @@
 <script lang="ts">
 	import { apiGet } from '$lib/api';
+	import TimeSeriesChart from '$lib/components/TimeSeriesChart.svelte';
 
 	let metric = 'sleep_duration';
 	let startDate = '2024-01-01';
 	let endDate = '2025-01-01';
 	let timeseriesData: any[] = [];
 	let loading = false;
+	let theme: 'light' | 'dark' = 'light';
 
 	const metricOptions = [
-		{ value: 'sleep_duration', label: 'Sleep Duration' },
-		{ value: 'resting_hr', label: 'Resting Heart Rate' },
-		{ value: 'hrv', label: 'HRV' },
-		{ value: 'stress', label: 'Stress' },
-		{ value: 'steps', label: 'Steps' }
+		{ value: 'sleep_duration', label: 'Sleep Duration', unit: 'hours' },
+		{ value: 'resting_hr', label: 'Resting Heart Rate', unit: 'bpm' },
+		{ value: 'hrv', label: 'HRV', unit: 'ms' },
+		{ value: 'stress', label: 'Stress', unit: 'level' },
+		{ value: 'steps', label: 'Steps', unit: 'steps' }
 	];
+
+	$: selectedMetric = metricOptions.find((m) => m.value === metric);
+	$: chartTitle = selectedMetric ? `${selectedMetric.label} Over Time` : 'Trends';
+	$: yAxisLabel = selectedMetric
+		? `${selectedMetric.label} (${selectedMetric.unit})`
+		: 'Value';
 
 	async function loadTrend() {
 		loading = true;
@@ -62,18 +70,21 @@
 
 	<div class="card visualization">
 		{#if loading}
-			<p>Loading time series data...</p>
-		{:else if timeseriesData.length > 0}
-			<h3>Time Series Preview (stub)</h3>
-			<p class="hint">
-				TODO: Add actual line chart visualization using Chart.js, Plotly, or similar library
-			</p>
-			<div class="data-preview">
-				<p>Data points: {timeseriesData.length}</p>
-				<pre>{JSON.stringify(timeseriesData.slice(0, 5), null, 2)}</pre>
+			<div class="loading-state">
+				<p>Loading time series data...</p>
 			</div>
+		{:else if timeseriesData.length > 0}
+			<TimeSeriesChart
+				data={timeseriesData}
+				title={chartTitle}
+				yAxisLabel={yAxisLabel}
+				showRollingAverage={true}
+				{theme}
+			/>
 		{:else}
-			<p class="hint">Click "Load Trend" to visualize your data</p>
+			<div class="empty-state">
+				<p class="hint">Click "Load Trend" to visualize your data</p>
+			</div>
 		{/if}
 	</div>
 </div>
@@ -102,21 +113,17 @@
 		min-height: 400px;
 	}
 
+	.loading-state,
+	.empty-state {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 400px;
+		text-align: center;
+	}
+
 	.hint {
 		color: var(--color-text-secondary);
 		font-style: italic;
-	}
-
-	.data-preview {
-		margin-top: var(--spacing);
-		padding: var(--spacing);
-		background-color: var(--color-bg);
-		border-radius: var(--border-radius);
-	}
-
-	.data-preview pre {
-		color: var(--color-text-secondary);
-		font-size: 0.85rem;
-		overflow-x: auto;
 	}
 </style>

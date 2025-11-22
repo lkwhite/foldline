@@ -1,20 +1,45 @@
 <script lang="ts">
 	import { apiGet } from '$lib/api';
 	import FeatureGate from '$lib/components/FeatureGate.svelte';
+	import ScatterPlot from '$lib/components/ScatterPlot.svelte';
 
 	let xMetric = 'sleep_duration';
 	let yMetric = 'resting_hr';
 	let lagDays = 0;
 	let correlationData: any = null;
 	let loading = false;
+	let theme: 'light' | 'dark' = 'light';
 
 	const metricOptions = [
-		{ value: 'sleep_duration', label: 'Sleep Duration' },
-		{ value: 'resting_hr', label: 'Resting Heart Rate' },
-		{ value: 'hrv', label: 'HRV' },
-		{ value: 'stress', label: 'Stress' },
-		{ value: 'steps', label: 'Steps' }
+		{ value: 'sleep_duration', label: 'Sleep Duration', unit: 'hours' },
+		{ value: 'resting_hr', label: 'Resting Heart Rate', unit: 'bpm' },
+		{ value: 'hrv', label: 'HRV', unit: 'ms' },
+		{ value: 'stress', label: 'Stress', unit: 'level' },
+		{ value: 'steps', label: 'Steps', unit: 'steps' }
 	];
+
+	$: selectedXMetric = metricOptions.find((m) => m.value === xMetric);
+	$: selectedYMetric = metricOptions.find((m) => m.value === yMetric);
+	$: chartTitle = selectedXMetric && selectedYMetric
+		? `${selectedXMetric.label} vs ${selectedYMetric.label}`
+		: 'Correlation';
+	$: xAxisLabel = selectedXMetric
+		? `${selectedXMetric.label} (${selectedXMetric.unit})`
+		: 'X Metric';
+	$: yAxisLabel = selectedYMetric
+		? `${selectedYMetric.label} (${selectedYMetric.unit})`
+		: 'Y Metric';
+
+	// Transform API data to scatter plot format
+	$: scatterData = correlationData && correlationData.x_values && correlationData.y_values
+		? correlationData.x_values.map((x: number, i: number) => ({
+			x,
+			y: correlationData.y_values[i],
+			date: correlationData.dates ? correlationData.dates[i] : undefined
+		}))
+		: [];
+
+	$: correlationStats = correlationData?.stats || {};
 
 	async function loadCorrelation() {
 		loading = true;
@@ -67,44 +92,66 @@
 	</div>
 
 	{#if loading}
-		<div class="card">
+		<div class="card loading-state">
 			<p>Analyzing correlation...</p>
 		</div>
 	{:else if correlationData}
 		<div class="results-grid">
 			<div class="card stats-card">
 				<h3>Correlation Statistics</h3>
-				<div class="stat-row">
-					<span>Pearson r:</span>
-					<span class="stat-value">{correlationData.stats.pearson_r.toFixed(3)}</span>
-				</div>
-				<div class="stat-row">
-					<span>Pearson p:</span>
-					<span class="stat-value">{correlationData.stats.pearson_p.toFixed(4)}</span>
-				</div>
-				<div class="stat-row">
-					<span>Spearman r:</span>
-					<span class="stat-value">{correlationData.stats.spearman_r.toFixed(3)}</span>
-				</div>
-				<div class="stat-row">
-					<span>Spearman p:</span>
-					<span class="stat-value">{correlationData.stats.spearman_p.toFixed(4)}</span>
-				</div>
-				<div class="stat-row">
-					<span>Sample size:</span>
-					<span class="stat-value">{correlationData.stats.n}</span>
-				</div>
+				{#if correlationStats.pearson_r !== undefined}
+					<div class="stat-row">
+						<span>Pearson r:</span>
+						<span class="stat-value">{correlationStats.pearson_r.toFixed(3)}</span>
+					</div>
+				{/if}
+				{#if correlationStats.pearson_p !== undefined}
+					<div class="stat-row">
+						<span>Pearson p:</span>
+						<span class="stat-value">{correlationStats.pearson_p.toFixed(4)}</span>
+					</div>
+				{/if}
+				{#if correlationStats.spearman_r !== undefined}
+					<div class="stat-row">
+						<span>Spearman ρ:</span>
+						<span class="stat-value">{correlationStats.spearman_r.toFixed(3)}</span>
+					</div>
+				{/if}
+				{#if correlationStats.spearman_p !== undefined}
+					<div class="stat-row">
+						<span>Spearman p:</span>
+						<span class="stat-value">{correlationStats.spearman_p.toFixed(4)}</span>
+					</div>
+				{/if}
+				{#if correlationStats.n !== undefined}
+					<div class="stat-row">
+						<span>Sample size:</span>
+						<span class="stat-value">{correlationStats.n}</span>
+					</div>
+				{/if}
+				{#if lagDays > 0}
+					<div class="stat-row">
+						<span>Lag:</span>
+						<span class="stat-value">{lagDays} days</span>
+					</div>
+				{/if}
 			</div>
 
 			<div class="card visualization">
-				<h3>Scatter Plot (stub)</h3>
-				<p class="hint">
-					TODO: Add actual scatter plot visualization using Chart.js or Plotly
-				</p>
-				<div class="data-preview">
-					<p>Data points: {correlationData.x_values.length}</p>
-				</div>
+				<ScatterPlot
+					data={scatterData}
+					title={chartTitle}
+					{xAxisLabel}
+					{yAxisLabel}
+					showTrendLine={true}
+					{correlationStats}
+					{theme}
+				/>
 			</div>
+		</div>
+	{:else}
+		<div class="card empty-state">
+			<p class="hint">Select two metrics and click "Analyze" to see correlation</p>
 		</div>
 	{/if}
 	</FeatureGate>
@@ -157,19 +204,21 @@
 	}
 
 	.visualization {
+		min-height: 500px;
+	}
+
+	.loading-state,
+	.empty-state {
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		min-height: 400px;
+		text-align: center;
 	}
 
 	.hint {
 		color: var(--color-text-secondary);
 		font-style: italic;
-		margin-bottom: var(--spacing);
-	}
-
-	.data-preview {
-		padding: var(--spacing);
-		background-color: var(--color-bg);
-		border-radius: var(--border-radius);
 	}
 
 	@media (max-width: 768px) {

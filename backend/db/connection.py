@@ -12,7 +12,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 # Choose your database backend
-USE_DUCKDB = True  # Set to False to use SQLite instead
+USE_DUCKDB = False  # Set to True to use DuckDB (has schema issues with foreign keys currently)
 
 if USE_DUCKDB:
     import duckdb
