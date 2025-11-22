@@ -25,7 +25,10 @@
     <div class="buy-header">
       <h1 class="buy-title">Get Foldline</h1>
       <p class="buy-subtitle">
-        One-time purchase. Lifetime access. Your data stays local.
+        Free to download and use. Unlock premium features with a one-time purchase.
+      </p>
+      <p class="free-note">
+        The free version includes basic data analysis. Upgrade anytime for advanced features.
       </p>
     </div>
 
@@ -38,27 +41,35 @@
         </div>
 
         <div class="pricing-features">
-          <h3 class="features-title">What you get:</h3>
+          <h3 class="features-title">Premium features unlocked:</h3>
           <ul class="features-list">
             <li>
               <span class="feature-icon">✓</span>
-              <span>Complete desktop app for macOS, Windows, and Linux</span>
+              <span><strong>Unlimited data sources</strong> (free: Garmin only)</span>
             </li>
             <li>
               <span class="feature-icon">✓</span>
-              <span>All features unlocked, forever</span>
+              <span><strong>Full historical data</strong> (free: last 30 days)</span>
             </li>
             <li>
               <span class="feature-icon">✓</span>
-              <span>Future updates included</span>
+              <span><strong>Correlation analysis</strong> between metrics</span>
             </li>
             <li>
               <span class="feature-icon">✓</span>
-              <span>No subscriptions or recurring fees</span>
+              <span><strong>Data export</strong> to CSV, JSON, FIT</span>
             </li>
             <li>
               <span class="feature-icon">✓</span>
-              <span>Privacy-first: 100% local data processing</span>
+              <span><strong>Advanced filters</strong> and custom date ranges</span>
+            </li>
+            <li>
+              <span class="feature-icon">✓</span>
+              <span><strong>Multi-metric heatmaps</strong></span>
+            </li>
+            <li>
+              <span class="feature-icon">✓</span>
+              <span>All future updates included</span>
             </li>
           </ul>
         </div>
@@ -146,10 +157,20 @@
       <h2 class="section-title">Common questions</h2>
       <div class="faq-list">
         <div class="faq-item">
+          <h3 class="faq-question">Is there a free version?</h3>
+          <p class="faq-answer">
+            Yes! Foldline is free to download and use. The free version includes
+            basic data import, 30-day data access, and single-metric visualizations.
+            Premium features unlock unlimited data, advanced analytics, and export capabilities.
+          </p>
+        </div>
+
+        <div class="faq-item">
           <h3 class="faq-question">Do I need an account?</h3>
           <p class="faq-answer">
-            No. You only need your license key to activate the app. No login,
-            no account, no ongoing relationship with any server.
+            No. You only need your license key to activate premium features. No login,
+            no account, no ongoing relationship with any server. The free version requires
+            nothing at all.
           </p>
         </div>
 
@@ -215,6 +236,14 @@
     color: var(--color-text-secondary);
     max-width: 600px;
     margin: 0 auto;
+  }
+
+  .free-note {
+    font-size: var(--type-body-small);
+    color: var(--color-accent);
+    font-weight: var(--font-weight-medium);
+    max-width: 600px;
+    margin: var(--space-m) auto 0;
   }
 
   /* Pricing Card */

@@ -1,10 +1,19 @@
-import { writable } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 
 export interface LicenseState {
   isActivated: boolean;
   licenseKey: string | null;
   activatedAt: string | null;
 }
+
+export type PremiumFeature =
+  | 'unlimited_import'        // Free: Garmin only, Premium: all sources
+  | 'full_history'            // Free: 30 days, Premium: unlimited
+  | 'correlation_analysis'    // Premium only
+  | 'data_export'             // Premium only
+  | 'advanced_filters'        // Premium only
+  | 'custom_date_ranges'      // Premium only
+  | 'multi_metric_heatmaps';  // Free: single metric, Premium: multiple
 
 const STORAGE_KEY = 'foldline_license';
 
@@ -54,7 +63,19 @@ function createLicenseStore() {
       const masked = '••••-••••-••••-' + lastFour;
       return masked;
     },
+    hasFeature: (feature: PremiumFeature, state: LicenseState): boolean => {
+      // Premium features require activation
+      return state.isActivated;
+    },
   };
 }
 
 export const license = createLicenseStore();
+
+// Derived store for premium status
+export const isPremium = derived(license, ($license) => $license.isActivated);
+
+// Helper to check if a specific feature is available
+export const hasFeature = (feature: PremiumFeature) => {
+  return derived(license, ($license) => license.hasFeature(feature, $license));
+};

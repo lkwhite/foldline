@@ -31,9 +31,9 @@
 <!-- Hero Section -->
 <HeroSection
   title="Your physiological map, unfolded."
-  subtitle="Foldline maps your wearable data the way topographic maps reveal terrain: clean, structured, understated, and precise."
-  ctaPrimary="Get Foldline"
-  ctaSecondary="Learn how your data stays local"
+  subtitle="Privacy-first wearable data analyzer. Free to download with basic features. Upgrade anytime for advanced analytics."
+  ctaPrimary="Download Free"
+  ctaSecondary="See pricing & features"
   screenshotSrc="/screenshots/hero-dashboard.svg"
   screenshotAlt="Foldline dashboard showcasing clean data visualization"
 />

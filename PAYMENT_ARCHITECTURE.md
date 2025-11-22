@@ -6,11 +6,26 @@ Foldline uses a **privacy-first, local-only payment and licensing model** powere
 
 ## Payment Model
 
-### One-Time Purchase with Pay-What-You-Want (PWYW)
+### Freemium with One-Time Premium Upgrade
 
-- **Pricing**: Pay-what-you-want with a configurable minimum (e.g., $15 USD)
-- **No subscriptions**: Single purchase, lifetime access
-- **No feature tiers**: All users get the full product
+- **Free tier**: Download and use basic features at no cost
+- **Premium tier**: Pay-what-you-want upgrade (minimum $15 USD) for advanced features
+- **No subscriptions**: One-time payment, lifetime access
+- **Upgrade anytime**: Free users can upgrade whenever they're ready
+
+### Free vs Premium Features
+
+| Feature | Free | Premium |
+|---------|------|---------|
+| Data Sources | Garmin only | All supported devices |
+| Data History | Last 30 days | Unlimited |
+| Dashboard | ✓ | ✓ |
+| Heatmaps | Single metric | Multiple metrics |
+| Trend Charts | Basic | Advanced with filters |
+| Correlation Analysis | ✗ | ✓ |
+| Data Export | ✗ | ✓ (CSV, JSON, FIT) |
+| Custom Date Ranges | ✗ | ✓ |
+| Advanced Filters | ✗ | ✓ |
 
 ### Why Lemon Squeezy?
 
@@ -22,30 +37,64 @@ Foldline uses a **privacy-first, local-only payment and licensing model** powere
 
 ---
 
-## High-Level Purchase Flow
+## High-Level User Flows
+
+### Free Tier Flow
 
 ```
 User visits website
     ↓
-Clicks "Buy Foldline"
+Clicks "Download Free"
+    ↓
+Downloads app (.dmg/.exe/.AppImage)
+    ↓
+Installs and opens app
+    ↓
+Uses basic features (no license required)
+    ↓
+Sees upgrade prompts for premium features
+```
+
+### Premium Upgrade Flow (from within app)
+
+```
+User encounters premium feature gate
+    ↓
+Clicks "Upgrade to Premium"
     ↓
 Redirected to Lemon Squeezy hosted checkout
     ↓
 Completes purchase (PWYW amount)
     ↓
+Receives email with license key
+    ↓
+Returns to app → enters license key in settings
+    ↓
+Premium features unlocked immediately
+    ↓
+Full offline functionality with all features
+```
+
+### Direct Purchase Flow (from website)
+
+```
+User visits website
+    ↓
+Clicks "See Pricing" → navigates to /buy
+    ↓
+Clicks "Continue to Secure Checkout"
+    ↓
+Completes purchase on Lemon Squeezy
+    ↓
 Receives email with:
-  - Download link (direct to .dmg/.exe/.AppImage)
-  - License key (alphanumeric string)
+  - Download link
+  - License key
     ↓
 Downloads and installs app
     ↓
-Opens app → sees activation screen
+Opens app → enters license key in settings
     ↓
-Enters license key
-    ↓
-App validates and stores key locally
-    ↓
-Full offline functionality unlocked
+All premium features unlocked
 ```
 
 ---
