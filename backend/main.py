@@ -164,18 +164,18 @@ async def import_garmin_export(request: GarminExportRequest):
     """
     logger.info(f"Importing Garmin export from: {request.zip_path}")
 
+    import os
+    from db.connection import get_db
+    from ingestion.garmin_gdpr import process_gdpr_export
+
+    # Validate file exists
+    if not os.path.exists(request.zip_path):
+        raise HTTPException(status_code=400, detail=f"ZIP file not found: {request.zip_path}")
+
+    if not request.zip_path.lower().endswith('.zip'):
+        raise HTTPException(status_code=400, detail=f"File must be a ZIP archive: {request.zip_path}")
+
     try:
-        import os
-        from db.connection import get_db
-        from ingestion.garmin_gdpr import process_gdpr_export
-
-        # Validate file exists
-        if not os.path.exists(request.zip_path):
-            raise HTTPException(status_code=400, detail=f"ZIP file not found: {request.zip_path}")
-
-        if not request.zip_path.lower().endswith('.zip'):
-            raise HTTPException(status_code=400, detail=f"File must be a ZIP archive: {request.zip_path}")
-
         # Get database connection
         db = get_db()
 
@@ -242,18 +242,18 @@ async def import_fit_folder(request: FitFolderRequest):
     """
     logger.info(f"Importing FIT folder from: {request.folder_path}")
 
+    import os
+    from db.connection import get_db
+    from ingestion.fit_folder import process_fit_folder
+
+    # Validate directory exists
+    if not os.path.exists(request.folder_path):
+        raise HTTPException(status_code=400, detail=f"Directory not found: {request.folder_path}")
+
+    if not os.path.isdir(request.folder_path):
+        raise HTTPException(status_code=400, detail=f"Path is not a directory: {request.folder_path}")
+
     try:
-        import os
-        from db.connection import get_db
-        from ingestion.fit_folder import process_fit_folder
-
-        # Validate directory exists
-        if not os.path.exists(request.folder_path):
-            raise HTTPException(status_code=400, detail=f"Directory not found: {request.folder_path}")
-
-        if not os.path.isdir(request.folder_path):
-            raise HTTPException(status_code=400, detail=f"Path is not a directory: {request.folder_path}")
-
         # Get database connection
         db = get_db()
 
