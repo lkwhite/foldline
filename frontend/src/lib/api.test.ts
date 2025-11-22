@@ -15,7 +15,8 @@ import {
 	getBackendUrl,
 	apiGet,
 	apiPost,
-	checkBackendHealth
+	checkBackendHealth,
+	_resetBackendForTesting
 } from './api';
 
 // Mock Tauri's invoke function
@@ -29,6 +30,7 @@ describe('API Client', () => {
 	beforeEach(() => {
 		// Reset module state between tests
 		vi.clearAllMocks();
+		_resetBackendForTesting();
 
 		// Reset the global fetch mock
 		global.fetch = vi.fn();

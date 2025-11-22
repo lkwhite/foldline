@@ -83,3 +83,10 @@ export async function checkBackendHealth(): Promise<boolean> {
 		return false;
 	}
 }
+
+/**
+ * Reset backend state - for testing only
+ */
+export function _resetBackendForTesting(): void {
+	backendPort = null;
+}
